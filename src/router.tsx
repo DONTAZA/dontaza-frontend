@@ -1,13 +1,13 @@
-import { createBrowserRouter, Navigate } from 'react-router';
+import { createHashRouter } from 'react-router';
 import { RootLayout } from '@/layouts/RootLayout';
 import Home from '@/routes/Home';
 import MyPage from '@/routes/MyPage';
+import Login from '@/routes/Login';
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: '/login',
-    // 인증 연동 전에는 로그인 화면에서 막히지 않도록 홈으로 우회한다.
-    element: <Navigate replace to="/" />,
+    element: <Login />,
   },
   {
     // TODO: 인증 연동 후 ProtectedRoute 복원
