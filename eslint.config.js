@@ -9,7 +9,7 @@ import prettierConfig from 'eslint-config-prettier'
 
 export default [
   {
-    ignores: ['dist', 'node_modules', '.git'],
+    ignores: ['dist', 'node_modules', '.git', 'capacitor.config.ts'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
