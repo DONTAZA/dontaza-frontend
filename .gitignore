@@ -24,6 +24,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# Capacitor native projects (regenerate with: npx cap add ios/android && npx cap sync)
+ios/
+android/
+
 # Claude Code
 .claude
 CLAUDE.md
