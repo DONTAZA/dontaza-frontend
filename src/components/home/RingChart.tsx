@@ -14,7 +14,7 @@ export default function RingChart({ elapsedSec, claimedPoints, onClaim }: RingCh
   const currentMinutes = Math.floor(elapsedSec / 60)
 
   const isVerifying = elapsedSec < VERIFY_MINUTES * 60
-  const circumference = 2 * Math.PI * 120
+  const circumference = 2 * Math.PI * 100
   // 초 단위로 부드럽게 진행률 계산 (전체 20분 기준)
   const progress = Math.min(elapsedSec / (MAX_REWARDED_MINUTES * 60), 1)
   const progressDash = circumference * progress
@@ -27,29 +27,29 @@ export default function RingChart({ elapsedSec, claimedPoints, onClaim }: RingCh
   const earnedPoints = Math.max(0, totalEarned - claimedPoints)
 
   return (
-    <div className="relative flex flex-col items-center pt-4">
+    <div className="relative flex flex-col items-center">
       <div
-        className={`absolute h-72 w-72 rounded-full blur-3xl transition-colors duration-1000 ${
+        className={`absolute h-64 w-64 rounded-full blur-3xl transition-colors duration-1000 ${
           isVerifying ? 'bg-amber-500/5' : 'bg-neon-mint/5'
         }`}
       />
-      <div className="absolute h-56 w-56 rounded-full bg-electric-purple/5 blur-3xl" />
+      <div className="absolute h-48 w-48 rounded-full bg-electric-purple/5 blur-3xl" />
 
       <div className="relative">
-        <svg width="280" height="280" viewBox="0 0 300 300" className="relative z-10">
+        <svg width="240" height="240" viewBox="0 0 250 250" className="relative z-10">
           <circle
-            cx="150"
-            cy="150"
-            r="120"
+            cx="125"
+            cy="125"
+            r="100"
             fill="none"
             stroke="hsl(230 10% 14%)"
             strokeWidth="6"
             strokeLinecap="round"
           />
           <circle
-            cx="150"
-            cy="150"
-            r="120"
+            cx="125"
+            cy="125"
+            r="100"
             fill="none"
             stroke={isVerifying ? 'url(#yellowGradient)' : 'url(#mintGradient)'}
             strokeWidth="6"
@@ -60,13 +60,13 @@ export default function RingChart({ elapsedSec, claimedPoints, onClaim }: RingCh
             style={{
               filter: isVerifying ? 'none' : 'drop-shadow(0 0 8px hsl(155 100% 50% / 0.4))',
               transform: 'rotate(-90deg)',
-              transformOrigin: '150px 150px',
+              transformOrigin: '125px 125px',
             }}
           />
           <circle
-            cx="150"
-            cy="150"
-            r="105"
+            cx="125"
+            cy="125"
+            r="85"
             fill="none"
             stroke="hsl(230 10% 14%)"
             strokeWidth="3"
@@ -85,18 +85,18 @@ export default function RingChart({ elapsedSec, claimedPoints, onClaim }: RingCh
         </svg>
 
         <div className="absolute inset-0 z-20 flex flex-col gap-1 items-center justify-center">
-          <span className="mb-1 text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          <span className="mb-0.5 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
             {isVerifying ? '검증 중' : '적립 가능 시간'}
           </span>
           <span
-            className={`leading-none tracking-tight text-5xl font-black italic text-foreground transition-all duration-500 ${
+            className={`leading-none tracking-tight text-4xl font-black italic text-foreground transition-all duration-500 ${
               isVerifying ? '' : 'text-glow-mint'
             }`}
           >
             {currentMinutes}
           </span>
           <span
-            className={`text-lg font-light tracking-widest transition-colors duration-500 ${
+            className={`text-base font-light tracking-widest transition-colors duration-500 ${
               isVerifying ? 'text-amber-500' : 'text-neon-mint'
             }`}
           >

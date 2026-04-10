@@ -8,8 +8,8 @@ export default function Stats({ elapsedSec }: StatsProps) {
   const kcal = Math.floor(elapsedSec * 0.12)
 
   return (
-    <div className="px-5 pt-2 pb-8">
-      <div className="mb-6 grid grid-cols-2 gap-3">
+    <div className="px-5">
+      <div className="grid grid-cols-2 gap-3">
         <div className="glass-surface neumorphic-up rounded-xl p-4">
           <div className="mb-2 flex items-center gap-2">
             <Flame size={16} className="text-neon-mint" />

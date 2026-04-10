@@ -15,7 +15,7 @@ export default function RewardButton({ earnedPoints, onClaim, isVerifying }: Rew
       variant="ghost"
       disabled={!isReady}
       onClick={() => onClaim(earnedPoints)}
-      className={`relative mt-7 min-w-44 rounded-full px-8 py-6 text-base font-black tracking-wider transition-all duration-300 active:scale-[0.97] ${
+      className={`relative mt-2 min-w-40 rounded-full px-6 py-6 text-base font-black tracking-wider transition-all duration-300 active:scale-[0.97] ${
         isReady
           ? 'bg-linear-to-r from-amber-500 to-yellow-400 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:from-amber-500 hover:to-yellow-400 hover:text-black cursor-pointer'
           : 'bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground opacity-80'

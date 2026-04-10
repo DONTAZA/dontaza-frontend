@@ -12,10 +12,9 @@ export function BottomNav() {
   const navigate = useNavigate()
 
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-50 flex justify-center">
-      <div className="w-full max-w-md border-t border-glass-border/30 bg-glass/70 backdrop-blur-2xl">
-        <div className="flex">
-          {tabs.map((tab) => {
+    <div className="flex w-full justify-center border-t border-glass-border/30 bg-glass/70 backdrop-blur-2xl">
+      <div className="flex w-full">
+        {tabs.map((tab) => {
             const active = location.pathname === tab.path
 
             return (
@@ -39,8 +38,6 @@ export function BottomNav() {
             )
           })}
         </div>
-        <div className="h-[env(safe-area-inset-bottom)]" />
       </div>
-    </div>
   )
 }
