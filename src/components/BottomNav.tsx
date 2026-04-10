@@ -25,13 +25,13 @@ export function BottomNav() {
                 variant="ghost"
                 onClick={() => navigate(tab.path)}
                 aria-label={tab.label}
-                className="h-auto flex-1 items-center justify-center rounded-none py-4 transition-colors hover:bg-transparent cursor-pointer"
+                className="h-auto flex-1 items-center justify-center rounded-none py-4 transition-colors hover:bg-transparent"
               >
                 <tab.icon
                   size={22}
                   className={
                     active
-                      ? 'text-neon-mint drop-shadow-[0_0_8px_hsl(155_100%_50%_/_0.5)]'
+                      ? 'text-neon-mint drop-shadow-[0_0_8px_hsl(155_100%_50%/_0.5)]'
                       : 'text-muted-foreground'
                   }
                 />
