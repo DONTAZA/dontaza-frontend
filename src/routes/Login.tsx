@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
+import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { Button } from '@/components/ui/button'
 import { useKakaoLogin } from '@/hooks/useKakaoLogin'
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
-const REDIRECT_URI = 'dontaza://oauth'
+const NATIVE_REDIRECT_URI = 'dontaza://oauth'
 
 const BikeSilhouette = () => (
   <svg
@@ -45,7 +46,10 @@ const BikeSilhouette = () => (
 export default function Login() {
   const { mutate: loginWithKakao, isPending, isError } = useKakaoLogin()
 
+  // Native: 딥링크(dontaza://oauth?code=xxx)로 코드 수신
   useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return
+
     const listenerPromise = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
       const code = new URL(url).searchParams.get('code')
       if (code) {
@@ -59,14 +63,32 @@ export default function Login() {
     }
   }, [loginWithKakao])
 
+  // PWA: main.tsx에서 sessionStorage에 저장한 코드 처리
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) return
+
+    const code = sessionStorage.getItem('kakao_oauth_code')
+    if (code) {
+      sessionStorage.removeItem('kakao_oauth_code')
+      loginWithKakao(code)
+    }
+  }, [loginWithKakao])
+
   const handleKakaoLogin = async () => {
+    const isNative = Capacitor.isNativePlatform()
+    const redirectUri = isNative ? NATIVE_REDIRECT_URI : window.location.origin
+
     const kakaoAuthUrl =
       `https://kauth.kakao.com/oauth/authorize` +
       `?client_id=${KAKAO_REST_API_KEY}` +
-      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code`
 
-    await Browser.open({ url: kakaoAuthUrl })
+    if (isNative) {
+      await Browser.open({ url: kakaoAuthUrl })
+    } else {
+      window.location.href = kakaoAuthUrl
+    }
   }
 
   return (
