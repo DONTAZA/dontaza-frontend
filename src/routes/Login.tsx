@@ -1,4 +1,11 @@
+import { useEffect } from 'react'
+import { App as CapacitorApp } from '@capacitor/app'
+import { Browser } from '@capacitor/browser'
 import { Button } from '@/components/ui/button'
+import { useKakaoLogin } from '@/hooks/useKakaoLogin'
+
+const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
+const REDIRECT_URI = 'dontaza://oauth'
 
 const BikeSilhouette = () => (
   <svg
@@ -10,7 +17,14 @@ const BikeSilhouette = () => (
     aria-hidden="true"
   >
     <circle cx="45" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
-    <circle cx="155" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
+    <circle
+      cx="155"
+      cy="85"
+      r="30"
+      stroke="rgba(102, 255, 178, 0.9)"
+      strokeWidth="2"
+      fill="none"
+    />
     <path
       d="M45 85 L80 40 L120 40 L155 85 L120 40 L100 85 L45 85"
       stroke="rgba(102, 255, 178, 0.9)"
@@ -29,8 +43,30 @@ const BikeSilhouette = () => (
 )
 
 export default function Login() {
-  const handleKakaoLogin = () => {
-    // TODO: 카카오 OAuth 연동
+  const { mutate: loginWithKakao, isPending, isError } = useKakaoLogin()
+
+  useEffect(() => {
+    const listenerPromise = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      const code = new URL(url).searchParams.get('code')
+      if (code) {
+        Browser.close()
+        loginWithKakao(code)
+      }
+    })
+
+    return () => {
+      listenerPromise.then((l) => l.remove())
+    }
+  }, [loginWithKakao])
+
+  const handleKakaoLogin = async () => {
+    const kakaoAuthUrl =
+      `https://kauth.kakao.com/oauth/authorize` +
+      `?client_id=${KAKAO_REST_API_KEY}` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&response_type=code`
+
+    await Browser.open({ url: kakaoAuthUrl })
   }
 
   return (
@@ -59,16 +95,22 @@ export default function Login() {
         </div>
 
         <div className="relative z-10 space-y-3 px-8 pb-12">
+          {isError && (
+            <p className="text-center text-sm text-red-400">
+              로그인에 실패했습니다. 다시 시도해주세요.
+            </p>
+          )}
           <Button
             onClick={handleKakaoLogin}
+            disabled={isPending}
             size="lg"
-            className="h-auto w-full rounded-full py-4 text-base font-bold tracking-wide text-[#191919] transition-transform duration-200 active:scale-[0.97] hover:bg-[#FEE500]/95"
+            className="h-auto w-full rounded-full py-4 text-base font-bold tracking-wide text-[#191919] transition-transform duration-200 active:scale-[0.97] hover:bg-[#FEE500]/95 disabled:opacity-60"
             style={{
               background: '#FEE500',
               boxShadow: '0 0 20px rgba(254, 229, 0, 0.25)',
             }}
           >
-            카카오로 3초 만에 시작하기
+            {isPending ? '로그인 중...' : '카카오로 3초 만에 시작하기'}
           </Button>
 
           <p className="mt-4 text-center text-xs leading-5 text-white/50">
