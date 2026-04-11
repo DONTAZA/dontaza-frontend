@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 interface RidingState {
   rentedAt: string | null
@@ -7,17 +6,10 @@ interface RidingState {
   reset: () => void
 }
 
-const useRidingStore = create<RidingState>()(
-  persist(
-    (set) => ({
-      rentedAt: null,
-      start: (rentedAt) => set({ rentedAt }),
-      reset: () => set({ rentedAt: null }),
-    }),
-    {
-      name: 'riding-storage',
-    },
-  ),
-)
+const useRidingStore = create<RidingState>((set) => ({
+  rentedAt: null,
+  start: (rentedAt) => set({ rentedAt }),
+  reset: () => set({ rentedAt: null }),
+}))
 
 export default useRidingStore

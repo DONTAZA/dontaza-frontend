@@ -7,6 +7,7 @@ import EndAlert from '@/components/home/EndAlert'
 import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
 import useStartRide from '@/hooks/useStartRide'
 import useEndRide from '@/hooks/useEndRide'
+import useVerifyRiding from '@/hooks/useVerifyRiding'
 import useCurrentRiding from '@/hooks/useCurrentRiding'
 import useRidingStore from '@/stores/ridingStore'
 
@@ -31,13 +32,10 @@ export default function Home() {
   const rentedAt = useRidingStore((s) => s.rentedAt)
   const startRiding = useRidingStore((s) => s.start)
 
-  const [elapsedSec, setElapsedSec] = useState(() => {
-    const stored = useRidingStore.getState().rentedAt
-    if (!stored) return 0
-    return computeElapsed(stored)
-  })
+  const [elapsedSec, setElapsedSec] = useState(0)
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
+  const [verifyCalled, setVerifyCalled] = useState(false)
 
   const riding = rentedAt !== null
   const isVerifying = elapsedSec < VERIFY_SECONDS
@@ -45,27 +43,45 @@ export default function Home() {
 
   const startRide = useStartRide()
   const endRide = useEndRide()
+  const verify = useVerifyRiding()
 
-  // 라이딩 중일 때 서버 rentedAt으로 보정 (1회)
-  const { data: currentRiding } = useCurrentRiding(riding)
+  // 페이지 진입 시 서버에 진행 중인 라이딩 조회
+  const { data: currentRiding } = useCurrentRiding()
   useEffect(() => {
     if (currentRiding) {
       startRiding(currentRiding.rentedAt)
     }
   }, [currentRiding, startRiding])
 
+  // 라이딩이 끝나면 verify 호출 플래그 리셋
+  useEffect(() => {
+    if (!riding) setVerifyCalled(false)
+  }, [riding])
+
+  // 5분 경과 시점에 verify API 1회 호출
+  const verifyMutate = verify.mutate
+  useEffect(() => {
+    if (!riding || isVerifying || verifyCalled) return
+    setVerifyCalled(true)
+    verifyMutate()
+  }, [riding, isVerifying, verifyCalled, verifyMutate])
+
   useEffect(() => {
     requestGeolocationPermission()
   }, [])
 
-  // 매초 rentedAt 기준으로 경과 시간 재계산
+  // rentedAt 기준으로 경과 시간 계산 (즉시 + 매초)
   useEffect(() => {
-    if (!riding || !rentedAt) return
+    if (!rentedAt) {
+      setElapsedSec(0)
+      return
+    }
+    setElapsedSec(computeElapsed(rentedAt))
     const id = setInterval(() => {
       setElapsedSec(computeElapsed(rentedAt))
     }, 1000)
     return () => clearInterval(id)
-  }, [riding, rentedAt])
+  }, [rentedAt])
 
   useEffect(() => {
     const timer = setInterval(() => {
