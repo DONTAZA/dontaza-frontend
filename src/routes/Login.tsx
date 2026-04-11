@@ -8,34 +8,6 @@ import useKakaoLogin from '@/hooks/useKakaoLogin'
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
 const NATIVE_REDIRECT_URI = 'dontaza://oauth'
 
-const BikeSilhouette = () => (
-  <svg
-    width="200"
-    height="120"
-    viewBox="0 0 200 120"
-    fill="none"
-    className="opacity-30"
-    aria-hidden="true"
-  >
-    <circle cx="45" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
-    <circle cx="155" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
-    <path
-      d="M45 85 L80 40 L120 40 L155 85 L120 40 L100 85 L45 85"
-      stroke="rgba(102, 255, 178, 0.9)"
-      strokeWidth="2"
-      fill="none"
-    />
-    <circle
-      cx="80"
-      cy="40"
-      r="5"
-      fill="rgba(102, 255, 178, 0.3)"
-      stroke="rgba(102, 255, 178, 0.9)"
-      strokeWidth="1"
-    />
-  </svg>
-)
-
 export default function Login() {
   const { mutate: loginWithKakao, isPending, isError } = useKakaoLogin()
 
@@ -92,10 +64,10 @@ export default function Login() {
 
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-8">
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <BikeSilhouette />
+            <img src="/logo.png" alt="돈타자 로고" className="h-24 w-24 object-contain" />
           </div>
 
-          <div className="animate-in fade-in zoom-in-95 mt-6 mb-2 duration-700">
+          <div className="animate-in fade-in zoom-in-95 mt-2 mb-4 duration-700">
             <h1 className="text-5xl font-black italic tracking-tight text-white">
               돈
               <span className="text-[#66FFB2] [text-shadow:0_0_18px_rgba(102,255,178,0.55)]">
