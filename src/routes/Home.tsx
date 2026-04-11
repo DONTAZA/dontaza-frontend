@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
-import StationPinInput from '@/components/home/StationPinInput'
+import StartButton from '@/components/home/StartButton'
 import RewardButton from '@/components/home/RewardButton'
 import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
 
@@ -17,7 +17,6 @@ const MESSAGES_AFTER = ['종료하기를 눌러 반납하세요', '반납하여 
 
 export default function Home() {
   const [riding, setRiding] = useState(false)
-  const [ending, setEnding] = useState(false)
   const [elapsedSec, setElapsedSec] = useState(0)
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
@@ -50,10 +49,10 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [messages.length])
 
-  const handleStartRide = useCallback((pin: string) => {
+  const handleStartRide = useCallback(() => {
     getCurrentPosition()
       .then((pos) => {
-        console.log('[GPS] stationNo:', pin, '| lat:', pos.lat, '| lng:', pos.lng)
+        console.log('[GPS] | lat:', pos.lat, '| lng:', pos.lng)
       })
       .catch((err) => {
         console.error('[GPS] 위치 취득 실패:', err.message)
@@ -79,21 +78,7 @@ export default function Home() {
 
       <div className="flex flex-1 flex-col overflow-hidden p-4">
         {!riding ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-6">
-            <StationPinInput onComplete={handleStartRide} />
-          </div>
-        ) : ending ? (
-          <div className="flex flex-1 flex-col items-center justify-center">
-            <StationPinInput
-              title="라이딩을 종료하시겠습니까?"
-              subtitle="대여소 번호 4자리를 입력해주세요"
-              onCancel={() => setEnding(false)}
-              onComplete={() => {
-                setEnding(false)
-                handleEndRide()
-              }}
-            />
-          </div>
+          <StartButton onStart={handleStartRide} />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center pt-8">
             <div className="h-8 mb-4 overflow-hidden w-full text-center">
@@ -110,7 +95,7 @@ export default function Home() {
               onClaim={handleClaim}
             />
             <RewardButton
-              onEndRide={() => setEnding(true)}
+              onEndRide={handleEndRide}
               disabled={elapsedSec < VERIFY_SECONDS}
             />
           </div>
