@@ -1,10 +1,10 @@
-import { createHashRouter } from 'react-router';
-import { RootLayout } from '@/layouts/RootLayout';
-import Home from '@/routes/Home';
-import MyPage from '@/routes/MyPage';
-import Login from '@/routes/Login';
+import { createHashRouter } from 'react-router'
+import RootLayout from '@/layouts/RootLayout'
+import Home from '@/routes/Home'
+import MyPage from '@/routes/MyPage'
+import Login from '@/routes/Login'
 
-export const router = createHashRouter([
+const router = createHashRouter([
   {
     path: '/login',
     element: <Login />,
@@ -17,4 +17,6 @@ export const router = createHashRouter([
       { path: 'mypage', element: <MyPage /> },
     ],
   },
-]);
+])
+
+export default router

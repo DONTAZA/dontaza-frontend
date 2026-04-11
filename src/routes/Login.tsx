@@ -3,7 +3,7 @@ import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { Button } from '@/components/ui/button'
-import { useKakaoLogin } from '@/hooks/useKakaoLogin'
+import useKakaoLogin from '@/hooks/useKakaoLogin'
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
 const NATIVE_REDIRECT_URI = 'dontaza://oauth'
@@ -18,14 +18,7 @@ const BikeSilhouette = () => (
     aria-hidden="true"
   >
     <circle cx="45" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
-    <circle
-      cx="155"
-      cy="85"
-      r="30"
-      stroke="rgba(102, 255, 178, 0.9)"
-      strokeWidth="2"
-      fill="none"
-    />
+    <circle cx="155" cy="85" r="30" stroke="rgba(102, 255, 178, 0.9)" strokeWidth="2" fill="none" />
     <path
       d="M45 85 L80 40 L120 40 L155 85 L120 40 L100 85 L45 85"
       stroke="rgba(102, 255, 178, 0.9)"

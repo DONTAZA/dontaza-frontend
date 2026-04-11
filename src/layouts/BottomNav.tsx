@@ -7,7 +7,7 @@ const tabs = [
   { icon: User, label: 'mypage', path: '/mypage' },
 ]
 
-export function BottomNav() {
+export default function BottomNav() {
   const location = useLocation()
   const navigate = useNavigate()
 

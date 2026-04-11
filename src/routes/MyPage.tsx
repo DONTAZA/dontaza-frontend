@@ -1,5 +1,6 @@
-import { Gift, CalendarDays, Settings, HelpCircle, FileText, User as UserIcon } from 'lucide-react'
-import { useAuthStore } from '@/stores/authStore'
+import { Gift, CalendarDays, User as UserIcon } from 'lucide-react'
+// import { Settings, HelpCircle, FileText } from 'lucide-react'
+import useAuthStore from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 
 const gridMenu = [
@@ -15,11 +16,11 @@ const gridMenu = [
   },
 ]
 
-const listMenu = [
-  { icon: Settings, label: '환경 설정' },
-  { icon: HelpCircle, label: '고객센터' },
-  { icon: FileText, label: '공지사항 및 이용약관' },
-]
+// const listMenu = [
+//   { icon: Settings, label: '환경 설정' },
+//   { icon: HelpCircle, label: '고객센터' },
+//   { icon: FileText, label: '공지사항 및 이용약관' },
+// ]
 
 export default function MyPage() {
   const { user } = useAuthStore()

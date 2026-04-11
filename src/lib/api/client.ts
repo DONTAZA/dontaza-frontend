@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/authStore';
+import useAuthStore from '@/stores/authStore';
 import type { ApiError, ApiErrorResponse, ApiResponse } from '@/types/api';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://api.cashbike.io/api';
@@ -87,4 +87,6 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(BASE_URL);
+const apiClient = new ApiClient(BASE_URL)
+
+export default apiClient

@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router'
-import { BottomNav } from '@/components/BottomNav'
+import BottomNav from './BottomNav'
 
-export function RootLayout() {
+export default function RootLayout() {
   return (
     <div className="mx-auto flex h-svh w-full max-w-md flex-col overflow-hidden bg-background">
       <main className="relative flex min-h-0 flex-1 flex-col">
