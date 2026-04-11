@@ -1,8 +1,9 @@
 interface StartButtonProps {
   onStart: () => void
+  isPending?: boolean
 }
 
-export default function StartButton({ onStart }: StartButtonProps) {
+export default function StartButton({ onStart, isPending }: StartButtonProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6">
       <p className="text-sm font-medium uppercase tracking-[0.2em] text-foreground/80">
@@ -11,7 +12,8 @@ export default function StartButton({ onStart }: StartButtonProps) {
       <button
         type="button"
         onClick={onStart}
-        className="group relative flex h-48 w-48 items-center justify-center rounded-full transition-transform active:scale-95"
+        disabled={isPending}
+        className="group relative flex h-48 w-48 items-center justify-center rounded-full transition-transform active:scale-95 disabled:pointer-events-none disabled:opacity-60"
       >
         <div className="absolute inset-0 animate-[spin_20s_linear_infinite] rounded-full border-2 border-dashed border-primary/30" />
         <div className="absolute inset-3 rounded-full border border-primary/50 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]" />

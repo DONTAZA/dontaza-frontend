@@ -1,4 +1,4 @@
-export const API_ENDPOINTS = {
+const API_ENDPOINTS = {
   AUTH: {
     KAKAO_LOGIN: '/auth/kakao',
     LOGOUT: '/auth/logout',
@@ -12,14 +12,16 @@ export const API_ENDPOINTS = {
     DETAIL: (stationId: string) => `/stations/${stationId}`,
   },
   RIDING: {
-    START: '/riding/start',
+    RENT: '/riding/rent',
+    CURRENT: '/riding/current',
     VERIFY: (ridingId: number) => `/riding/${ridingId}/verify`,
-    END: (ridingId: number) => `/riding/${ridingId}/end`,
-    HISTORY: '/riding/history',
+    RETURN: (ridingId: number) => `/riding/${ridingId}/return`,
   },
   POINTS: {
     ME: '/points/me',
     CLAIM: '/points/claim',
     HISTORY: '/points/history',
   },
-} as const;
+} as const
+
+export default API_ENDPOINTS

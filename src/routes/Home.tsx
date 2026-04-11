@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
+import { toast } from 'sonner'
 import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
 import StartButton from '@/components/home/StartButton'
 import EndAlert from '@/components/home/EndAlert'
 import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
+import useStartRide from '@/hooks/useStartRide'
+import useRidingStore from '@/stores/ridingStore'
 
 const VERIFY_SECONDS = 300 // 5분
 const MAX_EARN_SECONDS = 1200 // 20분
@@ -15,32 +18,43 @@ const MESSAGES_BEFORE = [
 ]
 const MESSAGES_AFTER = ['자전거 반납 후 종료하기를 눌러주세요', '라이딩 종료 후 포인트를 적립하세요']
 
+function computeElapsed(rentedAt: string): number {
+  return Math.min(
+    Math.floor((Date.now() - new Date(rentedAt).getTime()) / 1000),
+    MAX_EARN_SECONDS,
+  )
+}
+
 export default function Home() {
-  const [riding, setRiding] = useState(false)
-  const [elapsedSec, setElapsedSec] = useState(0)
+  const ridingId = useRidingStore((s) => s.ridingId)
+  const rentedAt = useRidingStore((s) => s.rentedAt)
+
+  const [elapsedSec, setElapsedSec] = useState(() => {
+    const stored = useRidingStore.getState().rentedAt
+    if (!stored) return 0
+    return computeElapsed(stored)
+  })
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
 
+  const riding = ridingId !== null
   const isVerifying = elapsedSec < VERIFY_SECONDS
   const messages = isVerifying ? MESSAGES_BEFORE : MESSAGES_AFTER
+
+  const startRide = useStartRide()
 
   useEffect(() => {
     requestGeolocationPermission()
   }, [])
 
+  // 매초 rentedAt 기준으로 경과 시간 재계산
   useEffect(() => {
-    if (!riding) return
+    if (!riding || !rentedAt) return
     const id = setInterval(() => {
-      setElapsedSec((s) => {
-        if (s >= MAX_EARN_SECONDS) {
-          clearInterval(id)
-          return s
-        }
-        return s + 1
-      })
+      setElapsedSec(computeElapsed(rentedAt))
     }, 1000)
     return () => clearInterval(id)
-  }, [riding])
+  }, [riding, rentedAt])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,23 +63,17 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [messages.length])
 
-  const handleStartRide = useCallback(() => {
-    getCurrentPosition()
-      .then((pos) => {
-        console.log('[GPS] | lat:', pos.lat, '| lng:', pos.lng)
-      })
-      .catch((err) => {
-        console.error('[GPS] 위치 취득 실패:', err.message)
-      })
-    setRiding(true)
-    setElapsedSec(0)
-    setClaimedPoints(0)
-  }, [])
+  const handleStartRide = useCallback(async () => {
+    try {
+      const pos = await getCurrentPosition()
+      startRide.mutate({ lat: pos.lat, lng: pos.lng })
+    } catch {
+      toast.error('위치를 확인할 수 없습니다. GPS를 확인해주세요.')
+    }
+  }, [startRide])
 
   const handleEndRide = useCallback(() => {
-    setRiding(false)
-    setElapsedSec(0)
-    setClaimedPoints(0)
+    // TODO: useEndRide 연동
   }, [])
 
   const handleClaim = useCallback((points: number) => {
@@ -78,13 +86,13 @@ export default function Home() {
 
       <div className="flex flex-1 flex-col overflow-hidden p-4">
         {!riding ? (
-          <StartButton onStart={handleStartRide} />
+          <StartButton onStart={handleStartRide} isPending={startRide.isPending} />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center pt-8">
-            <div className="h-8 mb-4 overflow-hidden w-full text-center">
+            <div className="mb-4 h-8 w-full overflow-hidden text-center">
               <span
                 key={msgIndex}
-                className="text-sm font-medium tracking-wide text-foreground/80 animate-in fade-in slide-in-from-right-4 duration-700 block"
+                className="block text-sm font-medium tracking-wide text-foreground/80 animate-in fade-in slide-in-from-right-4 duration-700"
               >
                 {messages[msgIndex]}
               </span>
@@ -94,7 +102,7 @@ export default function Home() {
               claimedPoints={claimedPoints}
               onClaim={handleClaim}
             />
-            <EndAlert onConfirm={handleEndRide} disabled={elapsedSec < VERIFY_SECONDS} />
+            <EndAlert onConfirm={handleEndRide} disabled={isVerifying} />
           </div>
         )}
       </div>
