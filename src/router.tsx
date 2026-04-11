@@ -3,6 +3,7 @@ import RootLayout from '@/layouts/RootLayout'
 import Home from '@/routes/Home'
 import MyPage from '@/routes/MyPage'
 import Login from '@/routes/Login'
+import NotFound from '@/routes/NotFound'
 
 const router = createHashRouter([
   {
@@ -15,6 +16,7 @@ const router = createHashRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'mypage', element: <MyPage /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ])
