@@ -1,15 +1,28 @@
 import { useState, useEffect, useCallback } from 'react'
 import RingChart from '@/components/home/RingChart'
-import Stats from '@/components/home/Stats'
 import HomeHeader from '@/components/home/HomeHeader'
+import StationPinInput from '@/components/home/StationPinInput'
+import RewardButton from '@/components/home/RewardButton'
 
 const VERIFY_SECONDS = 300 // 5분
 const MAX_EARN_SECONDS = 1200 // 20분
 
+const MESSAGES_BEFORE = [
+  '대여를 검증하고 있어요',
+  '5분 뒤부터 라이딩을 종료할 수 있어요',
+  '종료 시 포인트가 적립돼요',
+]
+const MESSAGES_AFTER = ['종료하기를 눌러 반납하세요', '반납하여 포인트를 적립하세요']
+
 export default function Home() {
   const [riding, setRiding] = useState(false)
+  const [ending, setEnding] = useState(false)
   const [elapsedSec, setElapsedSec] = useState(0)
   const [claimedPoints, setClaimedPoints] = useState(0)
+  const [msgIndex, setMsgIndex] = useState(0)
+
+  const isVerifying = elapsedSec < VERIFY_SECONDS
+  const messages = isVerifying ? MESSAGES_BEFORE : MESSAGES_AFTER
 
   useEffect(() => {
     if (!riding) return
@@ -25,8 +38,21 @@ export default function Home() {
     return () => clearInterval(id)
   }, [riding])
 
-  const handleStartRide = useCallback(() => {
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMsgIndex((prev) => (prev + 1) % messages.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [messages.length])
+
+  const handleStartRide = useCallback((_pin: string) => {
     setRiding(true)
+    setElapsedSec(0)
+    setClaimedPoints(0)
+  }, [])
+
+  const handleEndRide = useCallback(() => {
+    setRiding(false)
     setElapsedSec(0)
     setClaimedPoints(0)
   }, [])
@@ -35,82 +61,51 @@ export default function Home() {
     setClaimedPoints((prev) => prev + points)
   }, [])
 
-  const formatTime = (sec: number) => {
-    const m = Math.floor(sec / 60)
-    const s = sec % 60
-    return `${m}:${s.toString().padStart(2, '0')}`
-  }
-
-  const isVerifying = riding && elapsedSec < VERIFY_SECONDS
-  const isEarning = riding && elapsedSec >= VERIFY_SECONDS && elapsedSec < MAX_EARN_SECONDS
-
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <HomeHeader />
 
-      {/* 메인 영역: 헤더~하단바 사이 균일 패딩 */}
       <div className="flex flex-1 flex-col overflow-hidden p-4">
         {!riding ? (
-          /* 대여 전 */
           <div className="flex flex-1 flex-col items-center justify-center gap-6">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              따릉이 대여 후 탭하세요
-            </p>
+            <StationPinInput onComplete={handleStartRide} />
+          </div>
+        ) : ending ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4">
+            <StationPinInput
+              title="라이딩을 종료하시겠습니까?"
+              subtitle="대여소 번호 4자리를 입력해주세요"
+              onComplete={() => {
+                setEnding(false)
+                handleEndRide()
+              }}
+            />
             <button
-              type="button"
-              onClick={handleStartRide}
-              className="group relative flex h-48 w-48 items-center justify-center rounded-full transition-transform active:scale-95"
+              onClick={() => setEnding(false)}
+              className="rounded-full border border-amber-400/50 px-8 py-3 text-base font-bold tracking-wider text-amber-400 transition-all duration-300 active:scale-[0.97]"
             >
-              <div className="absolute inset-0 animate-[spin_20s_linear_infinite] rounded-full border-2 border-dashed border-neon-mint/30" />
-              <div className="absolute inset-3 rounded-full border border-neon-mint/50 neon-glow-mint" />
-              <div className="absolute inset-6 flex items-center justify-center rounded-full bg-neon-mint/10 backdrop-blur-sm">
-                <div className="text-center">
-                  <span className="text-glow-mint block text-lg font-black tracking-wider text-neon-mint">
-                    자전거
-                  </span>
-                  <span className="text-glow-mint block text-lg font-black tracking-wider text-neon-mint">
-                    대여하기
-                  </span>
-                </div>
-              </div>
+              취소
             </button>
           </div>
         ) : (
-          /* 주행 중: 전체 영역을 flex-col로 잡고 Stats를 mt-auto로 밀어냄 */
-          <div className="flex flex-1 flex-col items-center w-full py-4">
-            {/* 뱃지와 차트를 하나의 그룹으로 묶어 중앙 정렬 */}
-            <div className="flex flex-1 flex-col items-center justify-center gap-1">
-              {/* 상태 뱃지 */}
-              <div className="flex h-10 w-full items-center justify-center">
-                {isVerifying && (
-                  <div className="glass-surface flex items-center gap-2 rounded-full border border-amber-500/30 px-4 py-2">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
-                    <span className="text-xs font-semibold tracking-wide text-amber-400">
-                      검증 중 · 적립 대기 {formatTime(VERIFY_SECONDS - elapsedSec)}
-                    </span>
-                  </div>
-                )}
-                {isEarning && (
-                  <div className="glass-surface flex items-center gap-2 rounded-full border border-neon-mint/30 px-4 py-2">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-neon-mint" />
-                    <span className="text-xs font-semibold tracking-wide text-neon-mint">
-                      적립 중 · 남은 시간 {formatTime(MAX_EARN_SECONDS - elapsedSec)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <RingChart
-                elapsedSec={elapsedSec}
-                claimedPoints={claimedPoints}
-                onClaim={handleClaim}
-              />
+          <div className="flex flex-1 flex-col items-center justify-center pt-8">
+            <div className="h-8 mb-4 overflow-hidden w-full text-center">
+              <span
+                key={msgIndex}
+                className="text-sm font-medium tracking-wide text-foreground/80 animate-in fade-in slide-in-from-right-4 duration-700 block"
+              >
+                {messages[msgIndex]}
+              </span>
             </div>
-
-            {/* 통계: 하단에 고정 */}
-            <div className="w-full mt-auto">
-              <Stats elapsedSec={elapsedSec} />
-            </div>
+            <RingChart
+              elapsedSec={elapsedSec}
+              claimedPoints={claimedPoints}
+              onClaim={handleClaim}
+            />
+            <RewardButton
+              onEndRide={() => setEnding(true)}
+              disabled={elapsedSec < VERIFY_SECONDS}
+            />
           </div>
         )}
       </div>

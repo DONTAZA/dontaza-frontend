@@ -1,12 +1,4 @@
-import {
-  Gift,
-  CalendarDays,
-  Settings,
-  HelpCircle,
-  FileText,
-  ChevronRight,
-  User as UserIcon,
-} from 'lucide-react'
+import { Gift, CalendarDays, Settings, HelpCircle, FileText, User as UserIcon } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 
@@ -67,7 +59,8 @@ export default function MyPage() {
             <Button
               key={item.label}
               variant="ghost"
-              className="glass-surface h-auto rounded-2xl p-5 flex flex-col items-center gap-3 border border-glass-border/40 active:scale-[0.97] transition-transform"
+              disabled
+              className="relative glass-surface h-auto rounded-2xl p-2 flex flex-col items-center gap-3 border border-glass-border/40"
             >
               <div className="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center">
                 <item.icon size={24} className={item.color} />
@@ -75,12 +68,26 @@ export default function MyPage() {
               <span className="text-sm font-semibold text-foreground tracking-wide">
                 {item.label}
               </span>
+
+              {/* 출시 예정 오버레이 */}
+              <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center rounded-2xl">
+                <span className="text-base font-bold text-foreground tracking-widest uppercase">
+                  출시 예정
+                </span>
+              </div>
             </Button>
           ))}
         </div>
 
+        {/* 로그아웃 */}
+        <div className="flex justify-end">
+          <button className="text-sm text-muted-foreground/80 underline underline-offset-4">
+            로그아웃
+          </button>
+        </div>
+
         {/* 리스트 메뉴 */}
-        <div className="glass-surface rounded-2xl overflow-hidden border border-glass-border/30">
+        {/* <div className="glass-surface rounded-2xl overflow-hidden border border-glass-border/30">
           {listMenu.map((item, i) => (
             <Button
               key={item.label}
@@ -96,7 +103,7 @@ export default function MyPage() {
               <ChevronRight size={16} className="text-muted-foreground" />
             </Button>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   )

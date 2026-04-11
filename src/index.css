@@ -6,7 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: hsl(230 20% 4%);
+  --background: hsl(210 20% 6%);
   --foreground: hsl(0 0% 95%);
   --card: hsl(230 15% 8%);
   --card-foreground: hsl(0 0% 95%);
@@ -33,12 +33,8 @@
   --glass-border: hsl(230 15% 20%);
   --shadow-neon-mint: 0 0 20px hsl(155 100% 50% / 0.3);
   --shadow-purple: 0 0 20px hsl(260 100% 50% / 0.3);
-  --shadow-neumorphic-up:
-    6px 6px 12px hsl(230 20% 2%),
-    -6px -6px 12px hsl(230 15% 10%);
-  --shadow-neumorphic-down:
-    inset 4px 4px 8px hsl(230 20% 2%),
-    inset -4px -4px 8px hsl(230 15% 10%);
+  --shadow-neumorphic-up: 6px 6px 12px hsl(230 20% 2%), -6px -6px 12px hsl(230 15% 10%);
+  --shadow-neumorphic-down: inset 4px 4px 8px hsl(230 20% 2%), inset -4px -4px 8px hsl(230 15% 10%);
   --font-display: 'Montserrat', sans-serif;
   --sidebar: hsl(230 15% 8%);
   --sidebar-foreground: hsl(0 0% 95%);

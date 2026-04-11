@@ -15,29 +15,29 @@ export function BottomNav() {
     <div className="flex w-full justify-center border-t border-glass-border/30 bg-glass/70 backdrop-blur-2xl">
       <div className="flex w-full">
         {tabs.map((tab) => {
-            const active = location.pathname === tab.path
+          const active = location.pathname === tab.path
 
-            return (
-              <Button
-                key={tab.path}
-                type="button"
-                variant="ghost"
-                onClick={() => navigate(tab.path)}
-                aria-label={tab.label}
-                className="h-auto flex-1 items-center justify-center rounded-none py-4 transition-colors hover:bg-transparent"
-              >
-                <tab.icon
-                  size={22}
-                  className={
-                    active
-                      ? 'text-neon-mint drop-shadow-[0_0_8px_hsl(155_100%_50%/_0.5)]'
-                      : 'text-muted-foreground'
-                  }
-                />
-              </Button>
-            )
-          })}
-        </div>
+          return (
+            <Button
+              key={tab.path}
+              type="button"
+              variant="ghost"
+              onClick={() => navigate(tab.path)}
+              aria-label={tab.label}
+              className="h-auto flex-1 items-center justify-center rounded-none py-6 transition-colors hover:bg-transparent"
+            >
+              <tab.icon
+                size={26}
+                className={
+                  active
+                    ? 'text-neon-mint drop-shadow-[0_0_8px_hsl(155_100%_50%/_0.5)]'
+                    : 'text-muted-foreground'
+                }
+              />
+            </Button>
+          )
+        })}
       </div>
+    </div>
   )
 }
