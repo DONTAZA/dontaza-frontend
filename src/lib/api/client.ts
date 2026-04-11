@@ -1,7 +1,7 @@
 import useAuthStore from '@/stores/authStore';
 import type { ApiError, ApiErrorResponse, ApiResponse } from '@/types/api';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://api.cashbike.io/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://d10g4nh94fyj2h.cloudfront.net/api';
 
 class ApiClient {
   private baseUrl: string;
@@ -11,34 +11,19 @@ class ApiClient {
   }
 
   private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+    return {
       'Content-Type': 'application/json',
     };
-
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
   }
 
   private async tryRefreshToken(): Promise<boolean> {
-    const storedRefreshToken = useAuthStore.getState().refreshToken
-    if (!storedRefreshToken) return false
-
     try {
       const response = await fetch(`${this.baseUrl}/auth/token/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: storedRefreshToken }),
+        credentials: 'include',
       })
-      if (!response.ok) return false
-
-      const data = await response.json()
-      useAuthStore.getState().setToken(data.data.accessToken)
-      useAuthStore.getState().setRefreshToken(data.data.refreshToken)
-      return true
+      return response.ok
     } catch {
       return false
     }
@@ -81,7 +66,8 @@ class ApiClient {
   }
 
   async get<T>(path: string): Promise<T> {
-    const fetchFn = () => fetch(`${this.baseUrl}${path}`, { method: 'GET', headers: this.getHeaders() })
+    const fetchFn = () =>
+      fetch(`${this.baseUrl}${path}`, { method: 'GET', headers: this.getHeaders(), credentials: 'include' })
     return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 
@@ -90,6 +76,7 @@ class ApiClient {
       fetch(`${this.baseUrl}${path}`, {
         method: 'POST',
         headers: this.getHeaders(),
+        credentials: 'include',
         body: body ? JSON.stringify(body) : undefined,
       })
     return this.handleResponse<T>(await fetchFn(), fetchFn)
@@ -100,6 +87,7 @@ class ApiClient {
       fetch(`${this.baseUrl}${path}`, {
         method: 'PUT',
         headers: this.getHeaders(),
+        credentials: 'include',
         body: body ? JSON.stringify(body) : undefined,
       })
     return this.handleResponse<T>(await fetchFn(), fetchFn)
@@ -107,7 +95,7 @@ class ApiClient {
 
   async delete<T>(path: string): Promise<T> {
     const fetchFn = () =>
-      fetch(`${this.baseUrl}${path}`, { method: 'DELETE', headers: this.getHeaders() })
+      fetch(`${this.baseUrl}${path}`, { method: 'DELETE', headers: this.getHeaders(), credentials: 'include' })
     return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 }
