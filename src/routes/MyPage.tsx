@@ -2,7 +2,9 @@ import { Gift, CalendarDays, User as UserIcon } from 'lucide-react'
 // import { Settings, HelpCircle, FileText } from 'lucide-react'
 import useAuthStore from '@/stores/authStore'
 import usePointsMe from '@/hooks/usePointsMe'
+import useLogout from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
+import LogoutAlert from '@/components/mypage/LogoutAlert'
 
 const gridMenu = [
   {
@@ -26,6 +28,7 @@ const gridMenu = [
 export default function MyPage() {
   const { user } = useAuthStore()
   const { data: pointsData } = usePointsMe()
+  const logoutMutation = useLogout()
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -91,9 +94,10 @@ export default function MyPage() {
 
         {/* 로그아웃 */}
         <div className="flex justify-end">
-          <button className="text-sm text-muted-foreground/80 underline underline-offset-4">
-            로그아웃
-          </button>
+          <LogoutAlert
+            onConfirm={() => logoutMutation.mutate()}
+            isPending={logoutMutation.isPending}
+          />
         </div>
 
         {/* 리스트 메뉴 */}
