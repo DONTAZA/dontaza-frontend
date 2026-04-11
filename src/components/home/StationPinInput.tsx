@@ -3,12 +3,14 @@ import { Loader2 } from 'lucide-react'
 
 interface StationPinInputProps {
   onComplete: (pin: string) => void
+  onCancel?: () => void
   title?: string
   subtitle?: string
 }
 
 export default function StationPinInput({
   onComplete,
+  onCancel,
   title = '자전거 대여소 번호',
   subtitle = '4자리를 입력하세요',
 }: StationPinInputProps) {
@@ -19,6 +21,8 @@ export default function StationPinInput({
   useEffect(() => {
     inputRefs.current[0]?.focus()
   }, [])
+
+  const isFull = pin.every((d) => d !== '')
 
   const handleChange = useCallback(
     (index: number, value: string) => {
@@ -31,18 +35,19 @@ export default function StationPinInput({
       if (digit && index < 3) {
         inputRefs.current[index + 1]?.focus()
       }
-
-      const full = newPin.join('')
-      if (full.length === 4 && newPin.every((d) => d !== '')) {
-        setLoading(true)
-        setTimeout(() => {
-          onComplete(full)
-          setLoading(false)
-        }, 1500)
-      }
     },
-    [pin, loading, onComplete]
+    [pin, loading]
   )
+
+  const handleConfirm = useCallback(() => {
+    if (!isFull || loading) return
+    const full = pin.join('')
+    setLoading(true)
+    setTimeout(() => {
+      onComplete(full)
+      setLoading(false)
+    }, 1500)
+  }, [isFull, loading, pin, onComplete])
 
   const handleKeyDown = useCallback(
     (index: number, e: React.KeyboardEvent) => {
@@ -78,11 +83,36 @@ export default function StationPinInput({
             disabled={loading}
             className={`w-14 h-16 rounded-lg border-2 text-center text-2xl font-black outline-none transition-all duration-200 bg-card ${
               pin[i]
-                ? 'border-primary text-primary shadow-[0_0_12px_hsl(var(--primary)/0.3)]'
+                ? 'border-primary text-foreground4 shadow-[0_0_12px_hsl(var(--primary)/0.3)]'
                 : 'border-muted-foreground/30 text-foreground focus:border-primary/60 focus:shadow-[0_0_8px_hsl(var(--primary)/0.15)]'
             } disabled:opacity-40`}
           />
         ))}
+      </div>
+
+      <div className="mb-6 flex gap-3">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="rounded-md border border-amber-400/50 px-6 py-2 text-base font-bold tracking-wider text-amber-400 transition-all duration-300 active:scale-[0.97] disabled:opacity-40"
+          >
+            취소
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={handleConfirm}
+          disabled={!isFull || loading}
+          className={`rounded-md border px-6 py-2 text-base font-bold tracking-wider transition-all duration-300 ${
+            isFull && !loading
+              ? 'border-neon-mint text-neon-mint active:scale-[0.97]'
+              : 'border-muted-foreground/30 text-muted-foreground/40 cursor-not-allowed'
+          }`}
+        >
+          확인
+        </button>
       </div>
 
       <div className="h-6 flex items-center justify-center">

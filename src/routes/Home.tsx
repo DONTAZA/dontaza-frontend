@@ -3,6 +3,7 @@ import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
 import StationPinInput from '@/components/home/StationPinInput'
 import RewardButton from '@/components/home/RewardButton'
+import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
 
 const VERIFY_SECONDS = 300 // 5분
 const MAX_EARN_SECONDS = 1200 // 20분
@@ -25,6 +26,10 @@ export default function Home() {
   const messages = isVerifying ? MESSAGES_BEFORE : MESSAGES_AFTER
 
   useEffect(() => {
+    requestGeolocationPermission()
+  }, [])
+
+  useEffect(() => {
     if (!riding) return
     const id = setInterval(() => {
       setElapsedSec((s) => {
@@ -45,7 +50,14 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [messages.length])
 
-  const handleStartRide = useCallback((_pin: string) => {
+  const handleStartRide = useCallback((pin: string) => {
+    getCurrentPosition()
+      .then((pos) => {
+        console.log('[GPS] stationNo:', pin, '| lat:', pos.lat, '| lng:', pos.lng)
+      })
+      .catch((err) => {
+        console.error('[GPS] 위치 취득 실패:', err.message)
+      })
     setRiding(true)
     setElapsedSec(0)
     setClaimedPoints(0)
@@ -71,21 +83,16 @@ export default function Home() {
             <StationPinInput onComplete={handleStartRide} />
           </div>
         ) : ending ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4">
+          <div className="flex flex-1 flex-col items-center justify-center">
             <StationPinInput
               title="라이딩을 종료하시겠습니까?"
               subtitle="대여소 번호 4자리를 입력해주세요"
+              onCancel={() => setEnding(false)}
               onComplete={() => {
                 setEnding(false)
                 handleEndRide()
               }}
             />
-            <button
-              onClick={() => setEnding(false)}
-              className="rounded-full border border-amber-400/50 px-8 py-3 text-base font-bold tracking-wider text-amber-400 transition-all duration-300 active:scale-[0.97]"
-            >
-              취소
-            </button>
           </div>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center pt-8">
