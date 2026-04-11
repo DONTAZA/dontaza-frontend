@@ -7,7 +7,6 @@ import EndAlert from '@/components/home/EndAlert'
 import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
 import useStartRide from '@/hooks/useStartRide'
 import useEndRide from '@/hooks/useEndRide'
-import useClaimPoints from '@/hooks/useClaimPoints'
 import useCurrentRiding from '@/hooks/useCurrentRiding'
 import useRidingStore from '@/stores/ridingStore'
 
@@ -46,7 +45,6 @@ export default function Home() {
 
   const startRide = useStartRide()
   const endRide = useEndRide()
-  const { mutate: claimPointsMutate } = useClaimPoints()
 
   // 라이딩 중일 때 서버 rentedAt으로 보정 (1회)
   const { data: currentRiding } = useCurrentRiding(riding)
@@ -89,18 +87,11 @@ export default function Home() {
     if (!riding) return
     try {
       const pos = await getCurrentPosition()
-      endRide.mutate(
-        { lat: pos.lat, lng: pos.lng },
-        {
-          onSuccess: (data) => {
-            claimPointsMutate({ ridingId: data.ridingId })
-          },
-        },
-      )
+      endRide.mutate({ lat: pos.lat, lng: pos.lng })
     } catch {
       toast.error('위치를 확인할 수 없습니다. GPS를 확인해주세요.')
     }
-  }, [riding, endRide, claimPointsMutate])
+  }, [riding, endRide])
 
   const handleClaim = useCallback((points: number) => {
     setClaimedPoints((prev) => prev + points)

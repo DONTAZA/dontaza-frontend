@@ -19,8 +19,6 @@ const API_ENDPOINTS = {
   },
   POINTS: {
     ME: '/points/me',
-    CLAIM: '/points/claim',
-    HISTORY: '/points/history',
   },
 } as const
 
