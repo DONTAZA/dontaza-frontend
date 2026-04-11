@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { toast } from 'sonner'
 import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
@@ -21,9 +21,9 @@ const MESSAGES_BEFORE = [
 ]
 const MESSAGES_AFTER = ['자전거 반납 후 종료하기를 눌러주세요', '라이딩 종료 후 포인트를 적립하세요']
 
-function computeElapsed(rentedAt: string): number {
+function computeElapsed(rentedAt: string, now: number): number {
   return Math.min(
-    Math.floor((Date.now() - new Date(rentedAt).getTime()) / 1000),
+    Math.floor((now - new Date(rentedAt).getTime()) / 1000),
     MAX_EARN_SECONDS,
   )
 }
@@ -32,12 +32,13 @@ export default function Home() {
   const rentedAt = useRidingStore((s) => s.rentedAt)
   const startRiding = useRidingStore((s) => s.start)
 
-  const [elapsedSec, setElapsedSec] = useState(0)
+  const [now, setNow] = useState(() => Date.now())
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
-  const [verifyCalled, setVerifyCalled] = useState(false)
+  const verifyCalledRef = useRef(false)
 
   const riding = rentedAt !== null
+  const elapsedSec = rentedAt ? computeElapsed(rentedAt, now) : 0
   const isVerifying = elapsedSec < VERIFY_SECONDS
   const messages = isVerifying ? MESSAGES_BEFORE : MESSAGES_AFTER
 
@@ -55,31 +56,27 @@ export default function Home() {
 
   // 라이딩이 끝나면 verify 호출 플래그 리셋
   useEffect(() => {
-    if (!riding) setVerifyCalled(false)
+    if (!riding) {
+      verifyCalledRef.current = false
+    }
   }, [riding])
 
   // 5분 경과 시점에 verify API 1회 호출
   const verifyMutate = verify.mutate
   useEffect(() => {
-    if (!riding || isVerifying || verifyCalled) return
-    setVerifyCalled(true)
+    if (!riding || isVerifying || verifyCalledRef.current) return
+    verifyCalledRef.current = true
     verifyMutate()
-  }, [riding, isVerifying, verifyCalled, verifyMutate])
+  }, [riding, isVerifying, verifyMutate])
 
   useEffect(() => {
     requestGeolocationPermission()
   }, [])
 
-  // rentedAt 기준으로 경과 시간 계산 (즉시 + 매초)
+  // rentedAt이 있을 때만 매초 now 업데이트 → elapsedSec은 렌더 중 파생
   useEffect(() => {
-    if (!rentedAt) {
-      setElapsedSec(0)
-      return
-    }
-    setElapsedSec(computeElapsed(rentedAt))
-    const id = setInterval(() => {
-      setElapsedSec(computeElapsed(rentedAt))
-    }, 1000)
+    if (!rentedAt) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [rentedAt])
 
