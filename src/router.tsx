@@ -4,11 +4,12 @@ import Home from '@/routes/Home'
 import MyPage from '@/routes/MyPage'
 import Login from '@/routes/Login'
 import NotFound from '@/routes/NotFound'
-import useAuthStore from '@/stores/authStore'
+import useUserProfile from '@/hooks/useUserProfile'
 
 function ProtectedRoute() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  const { isLoading, isError } = useUserProfile()
+  if (isLoading) return null
+  if (isError) return <Navigate to="/login" replace />
   return <Outlet />
 }
 

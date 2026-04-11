@@ -1,7 +1,6 @@
 import { Gift, CalendarDays, User as UserIcon } from 'lucide-react'
 // import { Settings, HelpCircle, FileText } from 'lucide-react'
-import useAuthStore from '@/stores/authStore'
-import usePointsMe from '@/hooks/usePointsMe'
+import useUserProfile from '@/hooks/useUserProfile'
 import useLogout from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
 import LogoutAlert from '@/components/mypage/LogoutAlert'
@@ -26,8 +25,7 @@ const gridMenu = [
 // ]
 
 export default function MyPage() {
-  const { user } = useAuthStore()
-  const { data: pointsData } = usePointsMe()
+  const { data: profile } = useUserProfile()
   const logoutMutation = useLogout()
 
   return (
@@ -38,9 +36,9 @@ export default function MyPage() {
         <div className="flex flex-col gap-6">
           <div className="glass-surface rounded-2xl p-6 flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-linear-to-br from-neon-mint/30 to-electric-purple/30 border border-glass-border/50 overflow-hidden flex items-center justify-center">
-              {user?.profileImageUrl ? (
+              {profile?.profileImageUrl ? (
                 <img
-                  src={user.profileImageUrl}
+                  src={profile?.profileImageUrl}
                   alt="프로필"
                   className="w-full h-full object-cover"
                 />
@@ -49,10 +47,7 @@ export default function MyPage() {
               )}
             </div>
             <div className="flex-1">
-              <p className="text-lg font-bold text-foreground">{user?.nickname || '라이더'}님</p>
-              <p className="text-xs text-muted-foreground tracking-wide mt-0.5">
-                {user?.id ? `dontaza_rider_${user.id}` : 'donataza_rider_01'}
-              </p>
+              <p className="text-lg font-bold text-foreground">{profile?.nickname || '라이더'}님</p>
             </div>
           </div>
 
@@ -61,7 +56,7 @@ export default function MyPage() {
               총 보유 포인트
             </p>
             <p className="text-2xl font-black italic text-neon-mint text-glow-mint tracking-tight">
-              {(pointsData?.totalPoints ?? 0).toLocaleString()} P
+              {(profile?.totalPoints ?? 0).toLocaleString()} P
             </p>
           </div>
         </div>

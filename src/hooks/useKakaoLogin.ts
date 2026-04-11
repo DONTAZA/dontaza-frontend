@@ -10,8 +10,8 @@ export default function useKakaoLogin() {
   return useMutation({
     mutationFn: ({ code, redirectUri }: { code: string; redirectUri: string }) =>
       kakaoLogin(code, redirectUri),
-    onSuccess: ({ user }) => {
-      login(user)
+    onSuccess: () => {
+      login()
       navigate('/')
     },
   })
