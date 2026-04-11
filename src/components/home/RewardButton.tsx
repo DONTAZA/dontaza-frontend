@@ -1,23 +1,27 @@
-interface EndRideButtonProps {
-  onEndRide: () => void
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+
+interface RewardButtonProps {
+  onClick?: () => void
   disabled?: boolean
 }
 
-export default function RewardButton({ onEndRide, disabled }: EndRideButtonProps) {
+export default function RewardButton({ onClick, disabled }: RewardButtonProps) {
   return (
-    <button
+    <Button
       type="button"
       disabled={disabled}
-      onClick={onEndRide}
-      className={`mt-8 flex items-center rounded-full px-8 py-3 transition-all duration-300 ${
+      onClick={onClick}
+      className={cn(
+        'mt-8 flex h-auto items-center rounded-full px-8 py-3 transition-all duration-300',
         disabled
-          ? 'bg-muted text-muted-foreground opacity-60 cursor-not-allowed'
-          : 'glass-pill cursor-pointer active:scale-[0.97] shadow-[0_0_20px_rgba(245,158,11,0.3)]'
-      }`}
+          ? 'cursor-not-allowed bg-muted text-muted-foreground opacity-60'
+          : 'glass-pill shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-[0.97]',
+      )}
     >
-      <span className={`text-base font-bold tracking-wider ${disabled ? '' : 'text-amber-400'}`}>
+      <span className={cn('text-base font-bold tracking-wider', !disabled && 'text-amber-400')}>
         라이딩 종료하기
       </span>
-    </button>
+    </Button>
   )
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
 import StartButton from '@/components/home/StartButton'
-import RewardButton from '@/components/home/RewardButton'
+import EndAlert from '@/components/home/EndAlert'
 import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
 
 const VERIFY_SECONDS = 300 // 5분
@@ -13,7 +13,7 @@ const MESSAGES_BEFORE = [
   '5분 뒤부터 라이딩을 종료할 수 있어요',
   '종료 시 포인트가 적립돼요',
 ]
-const MESSAGES_AFTER = ['종료하기를 눌러 반납하세요', '반납하여 포인트를 적립하세요']
+const MESSAGES_AFTER = ['자전거 반납 후 종료하기를 눌러주세요', '라이딩 종료 후 포인트를 적립하세요']
 
 export default function Home() {
   const [riding, setRiding] = useState(false)
@@ -94,10 +94,7 @@ export default function Home() {
               claimedPoints={claimedPoints}
               onClaim={handleClaim}
             />
-            <RewardButton
-              onEndRide={handleEndRide}
-              disabled={elapsedSec < VERIFY_SECONDS}
-            />
+            <EndAlert onConfirm={handleEndRide} disabled={elapsedSec < VERIFY_SECONDS} />
           </div>
         )}
       </div>
