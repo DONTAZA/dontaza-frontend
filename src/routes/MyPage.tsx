@@ -1,6 +1,7 @@
 import { Gift, CalendarDays, User as UserIcon } from 'lucide-react'
 // import { Settings, HelpCircle, FileText } from 'lucide-react'
 import useAuthStore from '@/stores/authStore'
+import usePointsMe from '@/hooks/usePointsMe'
 import { Button } from '@/components/ui/button'
 
 const gridMenu = [
@@ -24,7 +25,7 @@ const gridMenu = [
 
 export default function MyPage() {
   const { user } = useAuthStore()
-  const cash = 3200 // TODO: 포인트 정보를 스토어에서 가져오도록 수정 필요
+  const { data: pointsData } = usePointsMe()
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -33,8 +34,16 @@ export default function MyPage() {
         {/* 상단 프로필 영역 */}
         <div className="flex flex-col gap-6">
           <div className="glass-surface rounded-2xl p-6 flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-linear-to-br from-neon-mint/30 to-electric-purple/30 border border-glass-border/50 flex items-center justify-center">
-              <UserIcon size={28} className="text-neon-mint" />
+            <div className="w-16 h-16 rounded-full bg-linear-to-br from-neon-mint/30 to-electric-purple/30 border border-glass-border/50 overflow-hidden flex items-center justify-center">
+              {user?.profileImageUrl ? (
+                <img
+                  src={user.profileImageUrl}
+                  alt="프로필"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <UserIcon size={28} className="text-neon-mint" />
+              )}
             </div>
             <div className="flex-1">
               <p className="text-lg font-bold text-foreground">{user?.nickname || '라이더'}님</p>
@@ -49,7 +58,7 @@ export default function MyPage() {
               총 보유 포인트
             </p>
             <p className="text-2xl font-black italic text-neon-mint text-glow-mint tracking-tight">
-              {cash.toLocaleString()} P
+              {(pointsData?.totalPoints ?? 0).toLocaleString()} P
             </p>
           </div>
         </div>
