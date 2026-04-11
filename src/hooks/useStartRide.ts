@@ -9,8 +9,8 @@ export default function useStartRide() {
 
   return useMutation({
     mutationFn: (body: RentRequest) => rentBike(body),
-    onSuccess: (data) => {
-      startRiding(data.ridingId, new Date().toISOString())
+    onSuccess: () => {
+      startRiding(new Date().toISOString())
     },
     onError: (error: ApiError) => {
       console.error('[useStartRide]', error.code, error.message)

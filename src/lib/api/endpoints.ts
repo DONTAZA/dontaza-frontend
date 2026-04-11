@@ -14,8 +14,8 @@ const API_ENDPOINTS = {
   RIDING: {
     RENT: '/riding/rent',
     CURRENT: '/riding/current',
-    VERIFY: (ridingId: number) => `/riding/${ridingId}/verify`,
-    RETURN: (ridingId: number) => `/riding/${ridingId}/return`,
+    VERIFY: '/riding/verify',
+    RETURN: '/riding/return',
   },
   POINTS: {
     ME: '/points/me',

@@ -17,10 +17,10 @@ export async function getCurrentRiding(): Promise<CurrentRidingResponse> {
   return apiClient.get<CurrentRidingResponse>(API_ENDPOINTS.RIDING.CURRENT)
 }
 
-export async function verifyRiding(ridingId: number): Promise<VerifyResponse> {
-  return apiClient.get<VerifyResponse>(API_ENDPOINTS.RIDING.VERIFY(ridingId))
+export async function verifyRiding(): Promise<VerifyResponse> {
+  return apiClient.get<VerifyResponse>(API_ENDPOINTS.RIDING.VERIFY)
 }
 
-export async function returnBike(ridingId: number, body: ReturnRequest): Promise<ReturnResponse> {
-  return apiClient.post<ReturnResponse>(API_ENDPOINTS.RIDING.RETURN(ridingId), body)
+export async function returnBike(body: ReturnRequest): Promise<ReturnResponse> {
+  return apiClient.post<ReturnResponse>(API_ENDPOINTS.RIDING.RETURN, body)
 }
