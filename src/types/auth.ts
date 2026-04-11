@@ -8,3 +8,8 @@ export interface KakaoLoginResponse {
     profileImageUrl?: string
   }
 }
+
+export interface RefreshTokenResponse {
+  accessToken: string
+  refreshToken: string
+}

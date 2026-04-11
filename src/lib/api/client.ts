@@ -23,11 +23,39 @@ class ApiClient {
     return headers;
   }
 
-  private async handleResponse<T>(response: Response): Promise<T> {
+  private async tryRefreshToken(): Promise<boolean> {
+    const storedRefreshToken = useAuthStore.getState().refreshToken
+    if (!storedRefreshToken) return false
+
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/token/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: storedRefreshToken }),
+      })
+      if (!response.ok) return false
+
+      const data = await response.json()
+      useAuthStore.getState().setToken(data.data.accessToken)
+      useAuthStore.getState().setRefreshToken(data.data.refreshToken)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private async handleResponse<T>(response: Response, retryFn?: () => Promise<Response>): Promise<T> {
     if (response.status === 401) {
-      useAuthStore.getState().logout();
-      window.location.hash = '/login';
-      throw new Error('Unauthorized');
+      if (retryFn) {
+        const refreshed = await this.tryRefreshToken()
+        if (refreshed) {
+          const retried = await retryFn()
+          return this.handleResponse<T>(retried) // retryFn 없이 호출 → 무한 루프 방지
+        }
+      }
+      useAuthStore.getState().logout()
+      window.location.hash = '/login'
+      throw new Error('Unauthorized')
     }
 
     if (!response.ok) {
@@ -53,37 +81,34 @@ class ApiClient {
   }
 
   async get<T>(path: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'GET',
-      headers: this.getHeaders(),
-    });
-    return this.handleResponse<T>(response);
+    const fetchFn = () => fetch(`${this.baseUrl}${path}`, { method: 'GET', headers: this.getHeaders() })
+    return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    return this.handleResponse<T>(response);
+    const fetchFn = () =>
+      fetch(`${this.baseUrl}${path}`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      })
+    return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 
   async put<T>(path: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'PUT',
-      headers: this.getHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    return this.handleResponse<T>(response);
+    const fetchFn = () =>
+      fetch(`${this.baseUrl}${path}`, {
+        method: 'PUT',
+        headers: this.getHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      })
+    return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 
   async delete<T>(path: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'DELETE',
-      headers: this.getHeaders(),
-    });
-    return this.handleResponse<T>(response);
+    const fetchFn = () =>
+      fetch(`${this.baseUrl}${path}`, { method: 'DELETE', headers: this.getHeaders() })
+    return this.handleResponse<T>(await fetchFn(), fetchFn)
   }
 }
 
