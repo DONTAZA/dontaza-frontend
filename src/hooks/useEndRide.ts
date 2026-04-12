@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { returnBike } from '@/lib/api/riding'
 import useRidingStore from '@/stores/ridingStore'
 import type { ReturnRequest } from '@/types/riding'
-import type { ApiError } from '@/types/api'
 
 export default function useEndRide() {
   const resetRiding = useRidingStore((s) => s.reset)
@@ -10,12 +10,11 @@ export default function useEndRide() {
 
   return useMutation({
     mutationFn: (body: ReturnRequest) => returnBike(body),
-    onSuccess: () => {
+    onSuccess: (data) => {
       resetRiding()
+      toast.success(`${data.earnedPoints} 포인트 적립되었습니다.`)
+      void queryClient.invalidateQueries({ queryKey: ['points', 'me'] })
       void queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
-    },
-    onError: (error: ApiError) => {
-      console.error('[useEndRide]', error.code, error.message)
     },
   })
 }
