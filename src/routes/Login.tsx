@@ -98,7 +98,7 @@ export default function Login() {
               boxShadow: '0 0 20px rgba(254, 229, 0, 0.25)',
             }}
           >
-            {isPending ? '로그인 중...' : '카카오로 3초 만에 시작하기'}
+            {isPending ? '처리 중...' : '카카오로 3초 만에 시작하기'}
           </Button>
 
           <p className="mt-4 text-center text-xs leading-5 text-white/50">
