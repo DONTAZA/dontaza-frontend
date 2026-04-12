@@ -57,7 +57,7 @@ export default function MyPage() {
             )}
           </div>
           <div className="flex-1">
-            <p className="text-lg font-bold text-foreground">{profile?.nickname || '라이더'}님</p>
+            <p className="text-base font-bold text-foreground">{profile?.nickname || '라이더'}님</p>
           </div>
         </div>
 
