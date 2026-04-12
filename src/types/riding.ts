@@ -10,10 +10,11 @@ export interface RentResponse {
 }
 
 export interface CurrentRidingResponse {
-  ridingId: number
-  status: 'IN_PROGRESS'
-  rentedAt: string
+  active: boolean
+  ridingId: number | null
+  status: 'WAITING_VERIFICATION' | 'IN_PROGRESS' | null
   verifyAvailable: boolean
+  rentedAt: string | null
 }
 
 export interface VerifyResponse {

@@ -76,21 +76,27 @@ export default function Home() {
   // 페이지 진입 시 서버에 진행 중인 라이딩 조회
   const { data: currentRiding } = useCurrentRiding()
   useEffect(() => {
-    if (!currentRiding) return
-    const elapsed = computeElapsed(currentRiding.rentedAt, Date.now())
-    if (currentRiding.verifyAvailable) {
+    if (!currentRiding?.active || !currentRiding.rentedAt) return
+    const rentedAt = currentRiding.rentedAt
+
+    if (currentRiding.status === 'IN_PROGRESS') {
+      // 이미 검증 완료된 세션 → 바로 복원
+      startRiding(rentedAt)
+      setVerified()
+      return
+    }
+
+    // WAITING_VERIFICATION
+    const elapsed = computeElapsed(rentedAt, Date.now())
+    if (elapsed >= VERIFY_SECONDS && currentRiding.verifyAvailable) {
       if (verifyAttemptedRef.current) return
       verifyAttemptedRef.current = true
       // 5분 경과 + 미검증 → verify 후 startRiding (RingChart 깜빡임 방지)
-      pendingRentedAtRef.current = currentRiding.rentedAt
+      pendingRentedAtRef.current = rentedAt
       verifyMutate()
-    } else if (elapsed >= VERIFY_SECONDS) {
-      // 이미 검증 완료 → 바로 복원
-      startRiding(currentRiding.rentedAt)
-      setVerified()
     } else {
-      // 아직 verify 구간 전 → 바로 복원
-      startRiding(currentRiding.rentedAt)
+      // 아직 5분 미만 → store 복원만, 타이머 effect가 5분 시점에 verify 호출
+      startRiding(rentedAt)
     }
   }, [currentRiding, startRiding, setVerified, verifyMutate])
 
@@ -203,7 +209,7 @@ export default function Home() {
       </AlertDialog>
 
       <div className="flex flex-1 flex-col overflow-hidden p-4">
-        {!riding ? (
+        {!riding || verifyFailed ? (
           <StartButton onStart={handleStartRide} isPending={startRide.isPending} />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center pt-8">
