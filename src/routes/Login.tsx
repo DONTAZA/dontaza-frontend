@@ -5,6 +5,7 @@ import { Browser } from '@capacitor/browser'
 import { Button } from '@/components/ui/button'
 import useKakaoLogin from '@/hooks/useKakaoLogin'
 import useAgreeToTerms from '@/hooks/useAgreeToTerms'
+import usePWAInstall from '@/hooks/usePWAInstall'
 import TermsDialog from '@/components/auth/TermsDialog'
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
@@ -22,6 +23,8 @@ export default function Login() {
 
   const isPending = isLoginPending || isAgreePending
   const isError = isLoginError || isAgreeError
+
+  const { canInstall, install } = usePWAInstall()
 
   // Native: 딥링크(dontaza://oauth?code=xxx)로 코드 수신
   useEffect(() => {
@@ -111,6 +114,16 @@ export default function Login() {
           >
             {isPending ? '처리 중...' : '카카오로 3초 만에 시작하기'}
           </Button>
+          {!Capacitor.isNativePlatform() && canInstall && (
+            <Button
+              onClick={install}
+              variant="outline"
+              size="lg"
+              className="h-auto w-full rounded-full border-white/20 bg-white/5 py-4 text-base font-semibold tracking-wide text-white/80 backdrop-blur-sm transition-transform duration-200 active:scale-[0.97] hover:bg-white/10 hover:text-white"
+            >
+              홈 화면에 앱 추가
+            </Button>
+          )}
         </div>
       </div>
 
