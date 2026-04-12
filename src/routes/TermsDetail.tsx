@@ -3,11 +3,13 @@ import { ChevronLeft } from 'lucide-react'
 import termsOfServiceMd from '@/assets/legal/terms-of-service.md?raw'
 import privacyPolicyMd from '@/assets/legal/privacy-policy.md?raw'
 import locationTermsMd from '@/assets/legal/location-terms.md?raw'
+import pointsPolicyMd from '@/assets/legal/points-policy.md?raw'
 
 const TERMS_MAP = {
   service: { title: '서비스 이용약관', content: termsOfServiceMd },
   privacy: { title: '개인정보처리방침', content: privacyPolicyMd },
   location: { title: '위치정보 이용약관', content: locationTermsMd },
+  points: { title: '포인트 이용약관', content: pointsPolicyMd },
 } as const
 
 type TermsType = keyof typeof TERMS_MAP
