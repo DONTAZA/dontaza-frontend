@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>로그인 처리 중...</title>
+  </head>
+  <body>
+    <script>
+      const params = new URLSearchParams(window.location.search)
+      const code = params.get('code')
+      if (code) {
+        window.location.href = 'dontaza://oauth?code=' + code
+      }
+    </script>
+  </body>
+</html>

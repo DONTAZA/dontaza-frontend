@@ -8,8 +8,7 @@ import useAgreeToTerms from '@/hooks/useAgreeToTerms'
 import TermsDialog from '@/components/auth/TermsDialog'
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
-const NATIVE_REDIRECT_URI = 'dontaza://oauth'
-const WEB_REDIRECT_URI = `${window.location.origin}/oauth/kakao/callback`
+const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI as string
 
 export default function Login() {
   const [showTermsDialog, setShowTermsDialog] = useState(false)
@@ -32,7 +31,7 @@ export default function Login() {
       const code = new URL(url).searchParams.get('code')
       if (code) {
         Browser.close()
-        loginWithKakao({ code, redirectUri: NATIVE_REDIRECT_URI })
+        loginWithKakao({ code, redirectUri: REDIRECT_URI })
       }
     })
 
@@ -48,13 +47,13 @@ export default function Login() {
     const code = sessionStorage.getItem('kakao_oauth_code')
     if (code) {
       sessionStorage.removeItem('kakao_oauth_code')
-      loginWithKakao({ code, redirectUri: WEB_REDIRECT_URI })
+      loginWithKakao({ code, redirectUri: REDIRECT_URI })
     }
   }, [loginWithKakao])
 
   const handleKakaoLogin = async () => {
     const isNative = Capacitor.isNativePlatform()
-    const redirectUri = isNative ? NATIVE_REDIRECT_URI : WEB_REDIRECT_URI
+    const redirectUri = REDIRECT_URI
 
     const kakaoAuthUrl =
       `https://kauth.kakao.com/oauth/authorize` +
