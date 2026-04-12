@@ -1,9 +1,10 @@
 interface StartButtonProps {
   onStart: () => void
   isPending?: boolean
+  locationDenied?: boolean
 }
 
-export default function StartButton({ onStart, isPending }: StartButtonProps) {
+export default function StartButton({ onStart, isPending, locationDenied }: StartButtonProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6">
       <p className="text-sm font-medium uppercase tracking-[0.2em] text-foreground/80">
@@ -12,7 +13,7 @@ export default function StartButton({ onStart, isPending }: StartButtonProps) {
       <button
         type="button"
         onClick={onStart}
-        disabled={isPending}
+        disabled={isPending || locationDenied}
         className="group relative flex h-48 w-48 items-center justify-center rounded-full transition-transform active:scale-95 disabled:pointer-events-none disabled:opacity-60"
       >
         <div className="absolute inset-0 animate-[spin_20s_linear_infinite] rounded-full border-2 border-dashed border-primary/30" />
@@ -28,6 +29,13 @@ export default function StartButton({ onStart, isPending }: StartButtonProps) {
           </div>
         </div>
       </button>
+      {locationDenied && (
+        <p className="text-center text-xs text-muted-foreground">
+          위치 권한이 필요합니다.
+          <br />
+          기기 설정에서 위치 권한을 허용해주세요.
+        </p>
+      )}
     </div>
   )
 }

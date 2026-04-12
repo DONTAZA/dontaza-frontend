@@ -14,7 +14,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { getCurrentPosition, requestGeolocationPermission } from '@/hooks/useGeolocation'
+import {
+  getCurrentPosition,
+  requestGeolocationPermission,
+  checkGeolocationPermission,
+  GeolocationError,
+} from '@/hooks/useGeolocation'
 import useStartRide from '@/hooks/useStartRide'
 import useEndRide from '@/hooks/useEndRide'
 import useVerifyRiding from '@/hooks/useVerifyRiding'
@@ -51,6 +56,7 @@ export default function Home() {
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
   const [verifyFailed, setVerifyFailed] = useState(false)
+  const [locationDenied, setLocationDenied] = useState(false)
   // 서버 복원 시 verify 완료 전까지 startRiding을 지연시킬 임시 보관용
   const pendingRentedAtRef = useRef<string | null>(null)
   // verify 자동 트리거 1회 제한 (실패 시 무한 루프 방지)
@@ -122,7 +128,10 @@ export default function Home() {
   }, [riding, isVerifying, verified, verifyMutate])
 
   useEffect(() => {
-    requestGeolocationPermission()
+    requestGeolocationPermission().then(async () => {
+      const status = await checkGeolocationPermission()
+      setLocationDenied(status === 'denied')
+    })
   }, [])
 
   // rentedAt이 있을 때만 매초 now 업데이트 → elapsedSec은 렌더 중 파생
@@ -143,8 +152,12 @@ export default function Home() {
     try {
       const pos = await getCurrentPosition()
       startRide.mutate({ lat: pos.lat, lng: pos.lng })
-    } catch {
-      toast.error('위치를 확인할 수 없습니다. GPS를 확인해주세요.')
+    } catch (err) {
+      if (err instanceof GeolocationError && err.code === 1) {
+        setLocationDenied(true)
+      } else {
+        toast.error('위치를 확인할 수 없습니다. GPS를 확인해주세요.')
+      }
     }
   }, [startRide])
 
@@ -198,7 +211,11 @@ export default function Home() {
 
       <div className="flex flex-1 flex-col overflow-hidden p-4">
         {!riding || verifyFailed ? (
-          <StartButton onStart={handleStartRide} isPending={startRide.isPending} />
+          <StartButton
+            onStart={handleStartRide}
+            isPending={startRide.isPending}
+            locationDenied={locationDenied}
+          />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center pt-8">
             <div className="mb-4 h-8 w-full overflow-hidden text-center">

@@ -17,6 +17,28 @@ export class GeolocationError extends Error {
 }
 
 /**
+ * 현재 위치 권한 상태를 반환합니다.
+ */
+export async function checkGeolocationPermission(): Promise<'granted' | 'denied' | 'prompt'> {
+  if (Capacitor.isNativePlatform()) {
+    const permission = await Geolocation.checkPermissions()
+    if (permission.location === 'granted') return 'granted'
+    if (permission.location === 'denied') return 'denied'
+    return 'prompt'
+  }
+
+  if (!navigator.geolocation) return 'denied'
+  if (!navigator.permissions) return 'prompt'
+
+  try {
+    const result = await navigator.permissions.query({ name: 'geolocation' })
+    return result.state as 'granted' | 'denied' | 'prompt'
+  } catch {
+    return 'prompt'
+  }
+}
+
+/**
  * 위치 권한을 사전 요청합니다. 홈 진입 시점에 호출하세요.
  * - Native: Geolocation.requestPermissions()
  * - PWA: getCurrentPosition()으로 브라우저 권한 팝업 트리거
