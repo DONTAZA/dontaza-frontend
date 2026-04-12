@@ -13,6 +13,7 @@ export interface CurrentRidingResponse {
   ridingId: number
   status: 'IN_PROGRESS'
   rentedAt: string
+  verifyAvailable: boolean
 }
 
 export interface VerifyResponse {
@@ -22,6 +23,7 @@ export interface VerifyResponse {
 export interface ReturnRequest {
   lat: number
   lng: number
+  earnedPoints: number
 }
 
 export interface ReturnResponse {

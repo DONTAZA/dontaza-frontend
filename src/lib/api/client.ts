@@ -50,8 +50,8 @@ class ApiClient {
 
       const error: ApiError = {
         status: response.status,
-        code: errorResponse?.error.code,
-        message: errorResponse?.error.message ?? response.statusText,
+        code: errorResponse?.code,
+        message: errorResponse?.message ?? response.statusText,
       };
 
       throw error;
