@@ -9,6 +9,10 @@ export function kakaoLogin(authorizationCode: string, redirectUri: string) {
   })
 }
 
+export function agreeToTerms() {
+  return apiClient.patch<null>(API_ENDPOINTS.AUTH.AGREE)
+}
+
 export function logout() {
   return apiClient.delete<void>(API_ENDPOINTS.AUTH.LOGOUT)
 }

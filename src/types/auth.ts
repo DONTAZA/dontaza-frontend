@@ -4,5 +4,6 @@ export interface KakaoLoginResponse {
     id: number
     nickname: string
     profileImageUrl?: string
+    termsAgreed: boolean
   }
 }

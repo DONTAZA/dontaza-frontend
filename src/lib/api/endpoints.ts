@@ -1,6 +1,7 @@
 const API_ENDPOINTS = {
   AUTH: {
     KAKAO_LOGIN: '/auth/kakao',
+    AGREE: '/auth/agree',
     LOGOUT: '/auth/logout',
     WITHDRAW: '/auth/withdraw',
     REFRESH: '/auth/token/refresh',

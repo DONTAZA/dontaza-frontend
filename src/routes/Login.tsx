@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { Button } from '@/components/ui/button'
 import useKakaoLogin from '@/hooks/useKakaoLogin'
+import useAgreeToTerms from '@/hooks/useAgreeToTerms'
 import TermsDialog from '@/components/auth/TermsDialog'
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as string
@@ -11,8 +12,17 @@ const NATIVE_REDIRECT_URI = 'dontaza://oauth'
 const WEB_REDIRECT_URI = `${window.location.origin}/oauth/kakao/callback`
 
 export default function Login() {
-  const { mutate: loginWithKakao, isPending, isError } = useKakaoLogin()
-  const [pendingCode, setPendingCode] = useState<{ code: string; redirectUri: string } | null>(null)
+  const [showTermsDialog, setShowTermsDialog] = useState(false)
+
+  const handleNewUser = useCallback(() => setShowTermsDialog(true), [])
+
+  const { mutate: loginWithKakao, isPending: isLoginPending, isError: isLoginError, reset: resetLogin } = useKakaoLogin({
+    onNewUser: handleNewUser,
+  })
+  const { mutate: agree, isPending: isAgreePending, isError: isAgreeError } = useAgreeToTerms()
+
+  const isPending = isLoginPending || isAgreePending
+  const isError = isLoginError || isAgreeError
 
   // Native: 딥링크(dontaza://oauth?code=xxx)로 코드 수신
   useEffect(() => {
@@ -22,14 +32,14 @@ export default function Login() {
       const code = new URL(url).searchParams.get('code')
       if (code) {
         Browser.close()
-        setPendingCode({ code, redirectUri: NATIVE_REDIRECT_URI })
+        loginWithKakao({ code, redirectUri: NATIVE_REDIRECT_URI })
       }
     })
 
     return () => {
       listenerPromise.then((l) => l.remove())
     }
-  }, [])
+  }, [loginWithKakao])
 
   // PWA: main.tsx에서 sessionStorage에 저장한 코드 처리
   useEffect(() => {
@@ -38,9 +48,9 @@ export default function Login() {
     const code = sessionStorage.getItem('kakao_oauth_code')
     if (code) {
       sessionStorage.removeItem('kakao_oauth_code')
-      setPendingCode({ code, redirectUri: WEB_REDIRECT_URI })
+      loginWithKakao({ code, redirectUri: WEB_REDIRECT_URI })
     }
-  }, [])
+  }, [loginWithKakao])
 
   const handleKakaoLogin = async () => {
     const isNative = Capacitor.isNativePlatform()
@@ -57,15 +67,6 @@ export default function Login() {
     } else {
       window.location.href = kakaoAuthUrl
     }
-  }
-
-  const handleConfirm = () => {
-    if (!pendingCode) return
-    loginWithKakao(pendingCode)
-  }
-
-  const handleCancel = () => {
-    setPendingCode(null)
   }
 
   return (
@@ -111,15 +112,17 @@ export default function Login() {
           >
             {isPending ? '처리 중...' : '카카오로 3초 만에 시작하기'}
           </Button>
-
         </div>
       </div>
 
       <TermsDialog
-        open={pendingCode !== null}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-        isPending={isPending}
+        open={showTermsDialog}
+        onConfirm={() => agree()}
+        onCancel={() => {
+          setShowTermsDialog(false)
+          resetLogin()
+        }}
+        isPending={isAgreePending}
       />
     </div>
   )
