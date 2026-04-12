@@ -14,6 +14,7 @@ interface AlertDialogProps {
   trigger: (open: () => void) => ReactNode
   title: string
   description?: string
+  descriptionClassName?: string
   cancelLabel?: string
   confirmLabel?: string
   onConfirm: () => void
@@ -23,6 +24,7 @@ export default function AlertDialog({
   trigger,
   title,
   description,
+  descriptionClassName,
   cancelLabel = '취소',
   confirmLabel = '확인',
   onConfirm,
@@ -36,7 +38,11 @@ export default function AlertDialog({
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
+          {description && (
+            <AlertDialogDescription className={descriptionClassName}>
+              {description}
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="rounded-sm border-gray-600 text-foreground">
