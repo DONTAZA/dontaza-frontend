@@ -1,7 +1,11 @@
+import { Capacitor } from '@capacitor/core';
 import useAuthStore from '@/stores/authStore';
 import type { ApiError, ApiErrorResponse, ApiResponse } from '@/types/api';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://d10g4nh94fyj2h.cloudfront.net/api';
+const NATIVE_API_URL = 'https://d10g4nh94fyj2h.cloudfront.net/api';
+const BASE_URL = Capacitor.isNativePlatform()
+  ? NATIVE_API_URL
+  : (import.meta.env.VITE_API_BASE_URL ?? '/api');
 
 class ApiClient {
   private baseUrl: string;
