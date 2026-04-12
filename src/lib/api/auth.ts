@@ -22,3 +22,7 @@ export function agreeToTerms(data: AgreeToTermsRequest) {
 export function logout() {
   return apiClient.delete<void>(API_ENDPOINTS.AUTH.LOGOUT)
 }
+
+export function withdraw() {
+  return apiClient.delete<void>(API_ENDPOINTS.AUTH.WITHDRAW)
+}

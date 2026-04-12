@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router'
 import useUserProfile from '@/hooks/useUserProfile'
 import useLogout from '@/hooks/useLogout'
+import useWithdraw from '@/hooks/useWithdraw'
 import { Button } from '@/components/ui/button'
 import LogoutAlert from '@/components/mypage/LogoutAlert'
 import DeleteAccountAlert from '@/components/mypage/DeleteAccountAlert'
@@ -37,6 +38,7 @@ export default function MyPage() {
   const navigate = useNavigate()
   const { data: profile } = useUserProfile()
   const logoutMutation = useLogout()
+  const withdrawMutation = useWithdraw()
 
   return (
     <div className="flex-1 min-h-0 w-full overflow-y-auto px-6 pt-6 pb-6 flex flex-col gap-6">
@@ -122,8 +124,8 @@ export default function MyPage() {
           isPending={logoutMutation.isPending}
         />
         <DeleteAccountAlert
-          onConfirm={() => logoutMutation.mutate()}
-          isPending={logoutMutation.isPending}
+          onConfirm={() => withdrawMutation.mutate()}
+          isPending={withdrawMutation.isPending}
         />
       </div>
     </div>
