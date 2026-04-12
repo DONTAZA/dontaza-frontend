@@ -163,13 +163,7 @@ export default function Home() {
     setClaimedPoints((prev) => prev + points)
   }, [])
 
-  const handleVerifyRetry = useCallback(() => {
-    setVerifyFailed(false)
-    verifyAttemptedRef.current = true
-    verifyMutate()
-  }, [verifyMutate])
-
-  const handleVerifyCancel = useCallback(() => {
+  const handleVerifyFailedConfirm = useCallback(() => {
     setVerifyFailed(false)
     verifyAttemptedRef.current = false
     resetRiding()
@@ -185,24 +179,18 @@ export default function Home() {
           <AlertDialogHeader className="py-2">
             <AlertDialogTitle>라이딩 검증 실패</AlertDialogTitle>
             <AlertDialogDescription>
-              대여 검증에 실패했습니다. 다시 시도하시겠어요?
+              <p>대여 검증에 실패했습니다.</p>
+              <p>라이딩을 다시 시작해주세요.</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <AlertDialogFooter className="bg-transparent border-t-0 py-3 gap-2">
+          <AlertDialogFooter className="bg-transparent border-t-0 py-4">
             <AlertDialogAction
               variant="outline"
-              onClick={handleVerifyCancel}
-              className="rounded-sm border-white/30 px-5 text-white/70"
-            >
-              취소
-            </AlertDialogAction>
-            <AlertDialogAction
-              variant="outline"
-              onClick={handleVerifyRetry}
+              onClick={handleVerifyFailedConfirm}
               className="rounded-sm border-neon-mint/60 px-5 text-neon-mint"
             >
-              재시도
+              확인
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
