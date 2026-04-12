@@ -188,7 +188,7 @@ export default function Home() {
             <AlertDialogAction
               variant="outline"
               onClick={handleVerifyFailedConfirm}
-              className="rounded-sm border-neon-mint/60 px-5 text-neon-mint"
+              className="col-span-2 w-full rounded-sm border-neon-mint/60 text-neon-mint"
             >
               확인
             </AlertDialogAction>
