@@ -11,12 +11,8 @@ export default function useKakaoLogin() {
   return useMutation({
     mutationFn: ({ code, redirectUri }: { code: string; redirectUri: string }) =>
       kakaoLogin(code, redirectUri),
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       login()
-      if (data.isNewUser) {
-        navigate('/terms-agreement', { replace: true })
-        return
-      }
       await queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
       navigate('/', { replace: true })
     },

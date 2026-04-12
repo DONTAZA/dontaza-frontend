@@ -4,7 +4,6 @@ const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     WITHDRAW: '/auth/withdraw',
     REFRESH: '/auth/token/refresh',
-    AGREE: '/auth/agree',
   },
   USER: {
     PROFILE: '/users/me',

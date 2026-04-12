@@ -4,7 +4,6 @@ import Home from '@/routes/Home'
 import MyPage from '@/routes/MyPage'
 import Login from '@/routes/Login'
 import NotFound from '@/routes/NotFound'
-import TermsAgreement from '@/routes/TermsAgreement'
 import TermsDetail from '@/routes/TermsDetail'
 import useUserProfile from '@/hooks/useUserProfile'
 import useAuthStore from '@/stores/authStore'
@@ -34,8 +33,7 @@ const router = createHashRouter([
   {
     element: <ProtectedRoute />,
     children: [
-      { path: 'terms-agreement', element: <TermsAgreement /> },
-      { path: 'terms/:type', element: <TermsDetail /> },
+{ path: 'terms/:type', element: <TermsDetail /> },
       {
         element: <RootLayout />,
         children: [
