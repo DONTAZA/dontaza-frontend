@@ -1,4 +1,4 @@
-import AlertDialog from '@/components/common/AlertDialog'
+import CustomAlert from '@/components/common/CustomAlert'
 import RewardButton from '@/components/home/RewardButton'
 
 interface EndAlertProps {
@@ -9,7 +9,7 @@ interface EndAlertProps {
 
 export default function EndAlert({ onConfirm, disabled, isPending }: EndAlertProps) {
   return (
-    <AlertDialog
+    <CustomAlert
       trigger={(open) => (
         <RewardButton disabled={disabled || isPending} onClick={open} />
       )}

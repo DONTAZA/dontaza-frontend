@@ -9,45 +9,67 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { cn } from '@/lib/utils'
 
-interface AlertDialogProps {
-  trigger: (open: () => void) => ReactNode
+interface CustomAlertProps {
+  trigger?: (open: () => void) => ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   title: string
-  description?: string
+  description?: ReactNode
   descriptionClassName?: string
   cancelLabel?: string
   confirmLabel?: string
+  hideCancel?: boolean
   onConfirm: () => void
+  onCancel?: () => void
 }
 
-export default function AlertDialog({
+export default function CustomAlert({
   trigger,
+  open: controlledOpen,
+  onOpenChange,
   title,
   description,
   descriptionClassName,
   cancelLabel = '취소',
   confirmLabel = '확인',
+  hideCancel = false,
   onConfirm,
-}: AlertDialogProps) {
-  const [open, setOpen] = useState(false)
+  onCancel,
+}: CustomAlertProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : uncontrolledOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setUncontrolledOpen(next)
+    onOpenChange?.(next)
+  }
 
   return (
     <AlertDialogRoot open={open} onOpenChange={setOpen}>
-      {trigger(() => setOpen(true))}
+      {trigger?.(() => setOpen(true))}
 
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description && (
-            <AlertDialogDescription className={descriptionClassName}>
+            <AlertDialogDescription
+              className={cn('whitespace-pre-line', descriptionClassName)}
+            >
               {description}
             </AlertDialogDescription>
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-sm border-gray-600 text-foreground">
-            {cancelLabel}
-          </AlertDialogCancel>
+          {!hideCancel && (
+            <AlertDialogCancel
+              onClick={onCancel}
+              className="rounded-sm border-gray-600 text-foreground"
+            >
+              {cancelLabel}
+            </AlertDialogCancel>
+          )}
           <AlertDialogAction
             variant="outline"
             onClick={() => {

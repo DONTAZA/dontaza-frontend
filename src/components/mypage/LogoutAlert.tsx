@@ -1,4 +1,4 @@
-import AlertDialog from '@/components/common/AlertDialog'
+import CustomAlert from '@/components/common/CustomAlert'
 
 interface LogoutAlertProps {
   onConfirm: () => void
@@ -7,7 +7,7 @@ interface LogoutAlertProps {
 
 export default function LogoutAlert({ onConfirm, isPending }: LogoutAlertProps) {
   return (
-    <AlertDialog
+    <CustomAlert
       trigger={(open) => (
         <button
           type="button"
