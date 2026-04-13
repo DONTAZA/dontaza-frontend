@@ -5,15 +5,7 @@ import RingChart from '@/components/home/RingChart'
 import HomeHeader from '@/components/home/HomeHeader'
 import StartButton from '@/components/home/StartButton'
 import EndAlert from '@/components/home/EndAlert'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import CustomAlert from '@/components/common/CustomAlert'
 import {
   getCurrentPosition,
   requestGeolocationPermission,
@@ -24,6 +16,7 @@ import useStartRide from '@/hooks/useStartRide'
 import useEndRide from '@/hooks/useEndRide'
 import useVerifyRiding from '@/hooks/useVerifyRiding'
 import useCurrentRiding from '@/hooks/useCurrentRiding'
+import useCancelRiding from '@/hooks/useCancelRiding'
 import useRidingStore from '@/stores/ridingStore'
 
 const VERIFY_SECONDS = 300 // 5분
@@ -47,15 +40,18 @@ function computeElapsed(rentedAt: string, now: number): number {
 export default function Home() {
   const rentedAt = useRidingStore((s) => s.rentedAt)
   const verified = useRidingStore((s) => s.verified)
+  const dismissedRestore = useRidingStore((s) => s.dismissedRestore)
   const startRiding = useRidingStore((s) => s.start)
   const setVerified = useRidingStore((s) => s.setVerified)
   const resetRiding = useRidingStore((s) => s.reset)
+  const dismissRestore = useRidingStore((s) => s.dismissRestore)
   const queryClient = useQueryClient()
 
   const [now, setNow] = useState(() => Date.now())
   const [claimedPoints, setClaimedPoints] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
   const [verifyFailed, setVerifyFailed] = useState(false)
+  const [noStationAlert, setNoStationAlert] = useState(false)
   const [locationDenied, setLocationDenied] = useState(false)
   // 서버 복원 시 verify 완료 전까지 startRiding을 지연시킬 임시 보관용
   const pendingRentedAtRef = useRef<string | null>(null)
@@ -68,7 +64,10 @@ export default function Home() {
   const messages = isVerifying ? MESSAGES_BEFORE : MESSAGES_AFTER
 
   const startRide = useStartRide()
-  const endRide = useEndRide()
+  const endRide = useEndRide({
+    onNoStation: () => setNoStationAlert(true),
+  })
+  const cancelRide = useCancelRiding()
   const verify = useVerifyRiding({
     onFailure: () => {
       pendingRentedAtRef.current = null
@@ -82,6 +81,7 @@ export default function Home() {
   // 페이지 진입 시 서버에 진행 중인 라이딩 조회
   const { data: currentRiding } = useCurrentRiding()
   useEffect(() => {
+    if (dismissedRestore) return
     if (!currentRiding?.active || !currentRiding.rentedAt) return
     const rentedAt = currentRiding.rentedAt
 
@@ -104,7 +104,7 @@ export default function Home() {
       // 아직 5분 미만 → store 복원만, 타이머 effect가 5분 시점에 verify 호출
       startRiding(rentedAt)
     }
-  }, [currentRiding, startRiding, setVerified, verifyMutate])
+  }, [currentRiding, startRiding, setVerified, verifyMutate, dismissedRestore])
 
   // 복원 경로의 verify 완료 처리: 성공 시 startRiding, 실패는 useVerifyRiding이 처리
   useEffect(() => {
@@ -183,31 +183,43 @@ export default function Home() {
     queryClient.removeQueries({ queryKey: ['riding', 'current'] })
   }, [resetRiding, queryClient])
 
+  const handleNoStationConfirm = useCallback(() => {
+    setNoStationAlert(false)
+    verifyAttemptedRef.current = false
+    cancelRide.mutate(undefined, {
+      onSuccess: () => {
+        dismissRestore()
+        queryClient.removeQueries({ queryKey: ['riding', 'current'] })
+      },
+    })
+  }, [cancelRide, dismissRestore, queryClient])
+
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <HomeHeader />
 
-      <AlertDialog open={verifyFailed} onOpenChange={setVerifyFailed}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader className="py-2">
-            <AlertDialogTitle>라이딩 검증 실패</AlertDialogTitle>
-            <AlertDialogDescription>
-              <p>대여 검증에 실패했습니다.</p>
-              <p>라이딩을 다시 시작해주세요.</p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+      <CustomAlert
+        open={verifyFailed}
+        onOpenChange={setVerifyFailed}
+        title="라이딩 검증 실패"
+        description={'대여 검증에 실패했습니다.\n라이딩을 다시 시작해주세요.'}
+        hideCancel
+        onConfirm={handleVerifyFailedConfirm}
+      />
 
-          <AlertDialogFooter className="bg-transparent border-t-0 py-4">
-            <AlertDialogAction
-              variant="outline"
-              onClick={handleVerifyFailedConfirm}
-              className="col-span-2 w-full rounded-sm border-neon-mint/60 text-neon-mint"
-            >
-              확인
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CustomAlert
+        open={noStationAlert}
+        onOpenChange={setNoStationAlert}
+        title="주변에 대여소가 없어요"
+        description={
+          '50m 이내에 반납 가능한 대여소가 없어요.\n확인을 누르면 포인트가 적립되지 않습니다.'
+        }
+        descriptionClassName="break-keep leading-relaxed"
+        cancelLabel="대여소로 이동"
+        confirmLabel="확인"
+        onConfirm={handleNoStationConfirm}
+      />
+
 
       <div className="flex flex-1 flex-col overflow-hidden p-4">
         {!riding || verifyFailed ? (

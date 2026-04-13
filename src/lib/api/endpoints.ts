@@ -18,6 +18,7 @@ const API_ENDPOINTS = {
     CURRENT: '/riding/current',
     VERIFY: '/riding/verify',
     RETURN: '/riding/return',
+    CANCEL: '/riding/cancel',
   },
   POINTS: {
     ME: '/points/me',

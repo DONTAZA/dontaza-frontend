@@ -21,6 +21,10 @@ export interface VerifyResponse {
   verified: boolean
 }
 
+export interface CancelRidingResponse {
+  cancelledRidingIds: number[]
+}
+
 export interface ReturnRequest {
   lat: number
   lng: number

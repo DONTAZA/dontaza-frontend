@@ -7,6 +7,7 @@ import type {
   ReturnRequest,
   ReturnResponse,
   VerifyResponse,
+  CancelRidingResponse,
 } from '@/types/riding'
 
 export async function rentBike(body: RentRequest): Promise<RentResponse> {
@@ -23,4 +24,8 @@ export async function verifyRiding(): Promise<VerifyResponse> {
 
 export async function returnBike(body: ReturnRequest): Promise<ReturnResponse> {
   return apiClient.post<ReturnResponse>(API_ENDPOINTS.RIDING.RETURN, body)
+}
+
+export async function cancelRiding(): Promise<CancelRidingResponse> {
+  return apiClient.patch<CancelRidingResponse>(API_ENDPOINTS.RIDING.CANCEL)
 }
