@@ -13,6 +13,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       // ❗ 핵심: manifest 자동 생성 끄기
       manifest: false,
+      devOptions: { enabled: false },
       workbox: {
         runtimeCaching: [
           {
