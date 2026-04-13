@@ -76,7 +76,10 @@ export default function CustomAlert({
               setOpen(false)
               onConfirm()
             }}
-            className="rounded-sm border-neon-mint/60 text-neon-mint"
+            className={cn(
+              'rounded-sm border-neon-mint/60 text-neon-mint',
+              hideCancel && 'col-span-2 w-full',
+            )}
           >
             {confirmLabel}
           </AlertDialogAction>
