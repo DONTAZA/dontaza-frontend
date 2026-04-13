@@ -35,9 +35,7 @@ export default function TermsDetail() {
           <h1 className="text-base font-bold tracking-tight">{title}</h1>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-8 pb-20">
-          {renderMarkdown(content)}
-        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-8 pb-20">{renderMarkdown(content)}</div>
       </div>
     </div>
   )
@@ -54,7 +52,10 @@ function renderMarkdown(content: string) {
     }
     if (line.startsWith('## ')) {
       return (
-        <h2 key={i} className="mt-8 mb-3 text-base font-extrabold text-foreground border-b border-border pb-1">
+        <h2
+          key={i}
+          className="mt-8 mb-3 text-base font-extrabold text-foreground border-b border-border pb-1"
+        >
           {line.slice(3)}
         </h2>
       )
@@ -72,7 +73,10 @@ function renderMarkdown(content: string) {
     if (line.trim() === '') {
       return <div key={i} className="h-2" />
     }
-    const text = line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1')
+    const text = line
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
     return (
       <p key={i} className="text-sm leading-relaxed text-muted-foreground mb-1 break-keep">
         {text}

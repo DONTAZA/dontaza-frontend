@@ -32,8 +32,8 @@ const gridMenu = [
 const legalMenu = [
   { icon: FileText, label: '서비스 이용약관', path: '/terms/service' },
   { icon: MapPin, label: '위치정보 이용약관', path: '/terms/location' },
-  { icon: Shield, label: '개인정보처리방침', path: '/terms/privacy' },
   { icon: Coins, label: '포인트 이용약관', path: '/terms/points' },
+  { icon: Shield, label: '개인정보처리방침', path: '/terms/privacy' },
 ]
 
 export default function MyPage() {
